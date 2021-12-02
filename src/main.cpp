@@ -33,7 +33,6 @@ using namespace glm;
 #define PI 3.1415f
 class Application : public EventCallbacks {
    public:
-	enum Material { leaves, wood, dirt, stone };
 
 	WindowManager *windowManager = nullptr;
 
@@ -115,8 +114,8 @@ class Application : public EventCallbacks {
 
 		// Don't alow character to move around in y-space freely, only in xz
 		// plane
-		// u_vec.y = 0;
-		// w_vec.y = 0;
+		u_vec.y = 0;
+		w_vec.y = 0;
 
 		u_diff += movement.x * u_vec;
 		w_diff += movement.y * w_vec;
@@ -218,14 +217,35 @@ class Application : public EventCallbacks {
 		glViewport(0, 0, width, height);
 	}
 
-	void setFloorTexture() {
-		string file = "minecraft.jpg";
+	void setupBlocks() {
+		//Create ground
+		for(int i = -10; i < 10; ++i) {
+			for(int j = -10; j < 10; ++j) {
+				blocks->addBlock(grass, i, -1, j);
+			}
+		}
 
-		texture0 = make_shared<Texture>();
-		texture0->setFilename(resourceDir + "/" + file);
-		texture0->init();
-		texture0->setUnit(0);
-		texture0->setWrapModes(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+		// Create rock formationusing quadratic formula
+
+		// minX where y >= 0, i.e. where quadratic equation interesects y plane
+		int minX = -5;
+		int maxX = 9;
+		int midX = minX + (maxX - minX);
+
+		int maxY = 10;
+
+		float k = maxY / pow(minX - midX, 2);
+
+		for (int x = minX; x <= maxX; x++) {
+			// f(x) = -k * (x - midX)^2 + maxY
+			// Solve knowing f(minX) = 0
+
+			int f_of_x = -k * pow(x - minX, 2) + maxY;
+
+			for (int y = 0; y <= f_of_x; y++) {
+				blocks->addBlock(stone, x, y, -9);
+			}
+		}
 	}
 
 	void init() {
@@ -254,46 +274,16 @@ class Application : public EventCallbacks {
 		prog->addUniform("MatSpec");
 		prog->addUniform("MatShine");
 		prog->addUniform("light_intensity");
-		// prog->addAttribute("diffuse_coef");
 
 		blocks = new Blocks();
 
-		// blocks->texProg = prog;
-		// blocks->texProg = texProg;
-
-		// blocks->addBlock(grass, 5, 1, -11);
-		// blocks->addBlock(grass, 5, 0, 3); // Same location as liht
-
-		//Create ground
-		for(int i = -10; i < 10; ++i) {
-			for(int j = -10; j < 10; ++j) {
-				blocks->addBlock(grass, i, -1, j);
-			}
-		}
-
-		// TODO: REMOVE
-		// Initialize the GLSL program that we will use for texture mapping
-		// texProg = make_shared<Program>();
-		// texProg->setVerbose(true);
-		// texProg->setShaderNames(resourceDir + "/tex_vert.vert",
-		// 						resourceDir + "/tex_frag0.frag");
-		// texProg->init();
-		// texProg->addUniform("P");
-		// texProg->addUniform("V");
-		// texProg->addUniform("M");
-		// texProg->addUniform("flip");
-		// texProg->addUniform("Texture0");
-		// texProg->addAttribute("vertPos");
-		// texProg->addAttribute("vertNor");
-		// texProg->addAttribute("vertTex");
+		setupBlocks();
 
 		sky = make_shared<Texture>();
 		sky->setFilename(resourceDir + "/sky.png");
 		sky->init();
 		sky->setUnit(1);
 		sky->setWrapModes(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
-
-		setFloorTexture();
 
 		// Start and end at same point
 		path = Spline(camera_position, glm::vec3(20, gCamH, 20),
@@ -329,307 +319,6 @@ class Application : public EventCallbacks {
 		sphere_max.x = sphere->max.x;
 		sphere_max.y = sphere->max.y;
 		sphere_max.z = sphere->max.z;
-
-		// vector<tinyobj::shape_t> TOshapesB;
-		// vector<tinyobj::material_t> objMaterialsB;
-		// // load in the mesh and make the shape(s)
-		// rc = tinyobj::LoadObj(TOshapesB, objMaterialsB, errStr,
-		// 					  (resourceDir + "/cube.obj").c_str());
-		// if (!rc) {
-		// 	cerr << errStr << endl;
-		// } else {
-		// 	cube = make_shared<Shape>();
-		// 	cube->createShape(TOshapesB[0]);
-		// 	cube->measure();
-		// 	cube->init();
-
-		// 	float blocks = 16;
-
-		// 	float block_size = 1.0/blocks;
-
-		// 	//two per vertex, in order
-		// 	vector<float> cube_texture_coords = {
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 0, 1,
-		// 		// 1, 1,
-
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 0, 1,
-		// 		// 1, 1,
-
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 0, 1,
-		// 		// 1, 1,
-
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 0, 1,
-		// 		// 1, 1,
-
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 0, 1,
-		// 		// 1, 1,
-
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 0, 1,
-		// 		// 1, 1
-
-		// 		// - NEG Z
-		// 		0.5, 0.5,
-		// 		0.5f + block_size, 0.5,
-		// 		0.5, 0.5f + block_size,
-		// 		0.5f + block_size, 0.5f + block_size,
-
-		// 		// TOP (?), POS Y
-		// 		0.5f + block_size, 0.5f + block_size,
-		// 		0.5f + 2*block_size, 0.5f + block_size,
-		// 		0.5f + block_size, 0.5f + 2*block_size,
-		// 		0.5f + 2*block_size, 0.5f + 2*block_size,
-
-		// 		// POS Z
-		// 		0.5f + 2*block_size, 0.5f + 2*block_size,
-		// 		0.5f + 3*block_size, 0.5f + 2*block_size,
-		// 		0.5f + 2*block_size, 0.5f + 3*block_size,
-		// 		0.5f + 3*block_size, 0.5f + 3*block_size,
-
-
-		// 		// BOTTOM, NEG Y
-		// 		0.5f + 3*block_size, 0.5f + 3*block_size,
-		// 		0.5f + 4*block_size, 0.5f + 3*block_size,
-		// 		0.5f + 3*block_size, 0.5f + 4*block_size,
-		// 		0.5f + 4*block_size, 0.5f + 4*block_size,
-
-		// 		// POS X
-		// 		0.5f + 4*block_size, 0.5f + 4*block_size,
-		// 		0.5f + 5*block_size, 0.5f + 4*block_size,
-		// 		0.5f + 4*block_size, 0.5f + 5*block_size,
-		// 		0.5f + 5*block_size, 0.5f + 5*block_size,
-
-		// 		// 0, 0,
-		// 		// block_size, 0,
-		// 		// 0, block_size,
-		// 		// block_size, block_size,
-
-		// 		// NEG X
-		// 		0.5f + 5*block_size, 0.5f + 5*block_size,
-		// 		0.5f + 6*block_size, 0.5f + 5*block_size,
-		// 		0.5f + 5*block_size, 0.5f + 6*block_size,
-		// 		0.5f + 6*block_size, 0.5f + 6*block_size,
-				
-		// 		// 0, 1,
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 1, 1,
-		// 		// // 1, 0,
-		// 		// // 1, 1,
-
-		// 		// 0, 1,
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 1, 1,
-
-
-		// 		// 0, 1,
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 1, 1,
-
-		// 		// 0, 1,
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 1, 1,
-
-		// 		// 0, 1,
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 1, 1,
-
-		// 		// 0, 1,
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 1, 1,
-
-
-		// 		// 0, 1,
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 1, 1,
-
-		// 		// 0, 1,
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 1, 1,
-
-		// 		// 0, 1,
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 1, 1,
-
-		// 		// 0, 1,
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 1, 1,
-
-		// 		// 0, 1,
-		// 		// 0, 0,
-		// 		// 1, 0,
-		// 		// 1, 1,
-
-		// 		// 1, 1,
-		// 		// 1, 0,
-		// 		// 0, 0,
-		// 		// 0, 1,
-		// 	};
-
-		// 	cube->setTexBuf(cube_texture_coords);
-		// }
-
-		// cube_min.x = cube->min.x;
-		// cube_min.y = cube->min.y;
-		// cube_min.z = cube->min.z;
-
-		// cube_max.x = cube->max.x;
-		// cube_max.y = cube->max.y;
-		// cube_max.z = cube->max.z;
-
-		// code to load in the ground plane (CPU defined data passed to GPU)
-
-		// directly pass quad for the ground to the GPU
-
-		// float g_groundSize = 20;
-		// float g_groundY = 0;
-
-		// // A x-z plane at y = g_groundY of dimension [-g_groundSize,
-		// // g_groundSize]^2
-		// float GrndPos[] = {-g_groundSize, g_groundY, -g_groundSize,
-		// 				   -g_groundSize, g_groundY, g_groundSize,
-		// 				   g_groundSize,  g_groundY, g_groundSize,
-		// 				   g_groundSize,  g_groundY, -g_groundSize};
-
-		// float GrndNorm[] = {0, 1, 0, 
-		// 					0, 1, 0, 
-		// 					0, 1, 0,
-		// 					0, 1, 0, 
-		// 					0, 1, 0, 
-		// 					0, 1, 0
-		// };
-
-		// // Texture coords: 0-1, ratio of whole image
-		// static GLfloat GrndTex[] = {0, 0,  // back
-		// 							0, 1, 
-		// 							1, 1, 
-		// 							1, 0};
-
-		// unsigned short idx[] = {0, 1, 2,  //First face
-		// 						0, 2, 3}; //Second face
-
-		// // generate the ground VAO
-		// glGenVertexArrays(1, &GroundVertexArrayID);
-
-		// g_GiboLen = 6;
-		// glGenBuffers(1, &GrndBuffObj);
-		// glBindBuffer(GL_ARRAY_BUFFER, GrndBuffObj);
-		// glBufferData(GL_ARRAY_BUFFER, sizeof(GrndPos), GrndPos, GL_STATIC_DRAW);
-
-		// glGenBuffers(1, &GrndNorBuffObj);
-		// glBindBuffer(GL_ARRAY_BUFFER, GrndNorBuffObj);
-		// glBufferData(GL_ARRAY_BUFFER, sizeof(GrndNorm), GrndNorm,
-		// 			 GL_STATIC_DRAW);
-		
-		// glGenBuffers(1, &GrndTexBuffObj);
-		// glBindBuffer(GL_ARRAY_BUFFER, GrndTexBuffObj);
-		// glBufferData(GL_ARRAY_BUFFER, sizeof(GrndTex), GrndTex, GL_STATIC_DRAW);
-
-		// glGenBuffers(1, &GIndxBuffObj);
-		// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GIndxBuffObj);
-		// glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(idx), idx, GL_STATIC_DRAW);
-
-	}
-
-	// // code to draw the ground plane
-	// void drawGround(shared_ptr<Program> curS) {
-	// 	curS->bind();
-	// 	glBindVertexArray(GroundVertexArrayID);
-	// 	texture0->bind(curS->getUniform("Texture0"));
-	// 	// draw the ground plane
-	// 	SetModel(vec3(0, -1, 0), 0, 0, 1, curS);
-	// 	glEnableVertexAttribArray(0);
-	// 	glBindBuffer(GL_ARRAY_BUFFER, GrndBuffObj);
-	// 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	// 	glEnableVertexAttribArray(1);
-	// 	glBindBuffer(GL_ARRAY_BUFFER, GrndNorBuffObj);
-	// 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	// 	glEnableVertexAttribArray(2);
-	// 	glBindBuffer(GL_ARRAY_BUFFER, GrndTexBuffObj);
-	// 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-	// 	// draw!
-	// 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GIndxBuffObj);
-	// 	glDrawElements(GL_TRIANGLES, g_GiboLen, GL_UNSIGNED_SHORT, 0);
-
-	// 	glDisableVertexAttribArray(0);
-	// 	glDisableVertexAttribArray(1);
-	// 	glDisableVertexAttribArray(2);
-	// 	curS->unbind();
-	// }
-
-	// helper function to pass material data to the GPU
-	void SetMaterial(shared_ptr<Program> curS, Material m) {
-		float r;
-		float g;
-		float b;
-
-		float shine;
-
-		// Give r, g, b a value between 0 and 255
-		switch (m) {
-			case wood:
-				r = 106;
-				g = 86;
-				b = 56;
-
-				shine = 50;
-				break;
-			case leaves:
-				r = 7;
-				g = 52;
-				b = 0;
-
-				shine = 4;
-				break;
-			case dirt:
-				r = 121;
-				g = 85;
-				b = 58;
-
-				shine = 1;
-				break;
-			case stone:
-				r = 116;
-				g = 116;
-				b = 116;
-
-				shine = 10;
-				break;
-		}
-
-		// Divide by 255 to get number between 0 and 1
-		r /= 255.0;
-		g /= 255.0;
-		b /= 255.0;
-
-		// Assign reasonable rgb values
-		glUniform3f(curS->getUniform("MatDif"), r, g, b);
-		glUniform3f(curS->getUniform("MatSpec"), 0.5 * r, 0.5 * g, 0.5 * b);
-		glUniform3f(curS->getUniform("MatAmb"), 0.3 * r, 0.3 * g, 0.3 * b);
-		glUniform1f(curS->getUniform("MatShine"), shine);
 	}
 
 	/* helper function to set model trasnforms */
@@ -648,54 +337,6 @@ class Application : public EventCallbacks {
 		glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE,
 						   value_ptr(M->topMatrix()));
 	}
-
-	// void drawBlock(float x, float y, float z, shared_ptr<MatrixStack> Model,
-	// 			   Material m) {
-	// 	// Cube is one unit in length, from -0.5 to 0.5 all axises
-	// 	texProg->bind();
-	// 	texture0->bind(texProg->getUniform("Texture0"));
-
-	// 	Model->pushMatrix();
-
-	// 	Model->translate(vec3(x - 0.5, y - 0.5, z - 0.5));
-
-	// 	setModel(texProg, Model);
-
-	// 	cube->draw(texProg);
-
-	// 	Model->popMatrix();
-
-	// 	texProg->unbind();
-	// }
-
-	// void drawTree(int x, int z, shared_ptr<MatrixStack> Model) {
-	// 	// Draw tree
-	// 	// Top leaf
-	// 	drawBlock(x, 4, z, Model, Material(current_material));
-
-	// 	// Middle leaves
-	// 	drawBlock(x - 1, 3, z, Model, leaves);
-	// 	drawBlock(x, 3, z, Model, leaves);
-	// 	drawBlock(x + 1, 3, z, Model, leaves);
-	// 	drawBlock(x, 3, z + 1, Model, leaves);
-	// 	drawBlock(x, 3, z - 1, Model, leaves);
-
-	// 	// Bottom leaves
-	// 	drawBlock(x - 1, 2, z, Model, leaves);
-	// 	drawBlock(x, 2, z, Model, leaves);
-	// 	drawBlock(x + 1, 2, z, Model, leaves);
-	// 	drawBlock(x, 2, z + 1, Model, leaves);
-	// 	drawBlock(x, 2, z - 1, Model, leaves);
-
-	// 	drawBlock(x + 1, 2, z - 1, Model, leaves);
-	// 	drawBlock(x - 1, 2, z - 1, Model, leaves);
-	// 	drawBlock(x + 1, 2, z + 1, Model, leaves);
-	// 	drawBlock(x - 1, 2, z + 1, Model, leaves);
-
-	// 	// Stem
-	// 	drawBlock(x, 1, z, Model, wood);
-	// 	drawBlock(x, 0, z, Model, wood);
-	// }
 
 	void render(float frametime) {
 		calculateDiff();
@@ -766,65 +407,12 @@ class Application : public EventCallbacks {
 
 		prog->unbind();
 
+		// Draw all blocks
 		blocks->drawBlocks(Model);
-
-		// drawTree(1, -8, Model);
-		// drawTree(10, 7, Model);
-		// drawTree(-4, 8, Model);
-		// drawTree(-19, -8, Model);
-		// drawTree(6, -3, Model);
-
-		// // Dirt formation
-		// drawBlock(6, 0, -10, Model, dirt);
-		// drawBlock(5, 0, -10, Model, dirt);
-		// drawBlock(4, 0, -10, Model, dirt);
-
-		// drawBlock(6, 0, -11, Model, dirt);
-		// drawBlock(5, 0, -11, Model, dirt);
-		// drawBlock(4, 0, -11, Model, dirt);
-
-		// drawBlock(6, 1, -11, Model, dirt);
-		// drawBlock(5, 1, -11, Model, dirt);
-		// drawBlock(4, 1, -11, Model, dirt);
-
-		// Create rock formationusing quadratic formula
-
-		// minX where y >= 0, i.e. where quadratic equation interesects y plane
-		int minX = -2;
-		int maxX = 10;
-		int midX = minX + (maxX - minX);
-
-		int maxY = 10;
-
-		float k = maxY / pow(minX - midX, 2);
-
-		// for (int x = minX; x <= maxX; x++) {
-		// 	// f(x) = -k * (x - midX)^2 + maxY
-		// 	// Solve knowing f(minX) = 0
-
-		// 	int f_of_x = -k * pow(x - minX, 2) + maxY;
-
-		// 	for (int y = 0; y <= f_of_x; y++) {
-		// 		drawBlock(x, y, -13, Model, stone);
-		// 	}
-		// }
 
 		Model->popMatrix();
 
-		// prog->unbind();
-
-		// switch shaders to the texture mapping shader and draw the ground
-		// texProg->bind();
-
-		// // Draw dome (sky)
-		// Model->pushMatrix();
-		// Model->scale(vec3(40, 40, 40));
-		// glUniform1i(texProg->getUniform("flip"), -1);
-		// sky->bind(texProg->getUniform("Texture0"));
-		// setModel(texProg, Model);
-		// sphere->draw(texProg);
-		// Model->popMatrix();
-
+		//Draw scene for texture
 		blocks->texProg->bind();
 		glUniformMatrix4fv(blocks->texProg->getUniform("P"), 1, GL_FALSE,
 						   value_ptr(Projection->topMatrix()));
@@ -832,9 +420,6 @@ class Application : public EventCallbacks {
 		glUniformMatrix4fv(blocks->texProg->getUniform("M"), 1, GL_FALSE,
 						   value_ptr(Model->topMatrix()));
 		blocks->texProg->unbind();
-		// drawGround(texProg);
-
-		// texProg->unbind();
 
 		// Pop matrix stacks.
 		Projection->popMatrix();

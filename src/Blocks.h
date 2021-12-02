@@ -39,7 +39,8 @@ private:
 	vec4 coords(int x, int y);
 
 	vector<float> vectorFromCoords(vec4 v1, vec4 v2, vec4 v3, vec4 v4, vec4 v5, vec4 v6);
-
+	vector<float> vectorFromCoords(vec4 side);
+	
 	shared_ptr<Shape> loadCube();
 
 public:

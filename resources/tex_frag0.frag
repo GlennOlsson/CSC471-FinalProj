@@ -43,7 +43,7 @@ void main() {
 	int emission = length(lightDir) < 0.15 ? 1 : 0;
 
   	//to set the out color as the texture color 
-  	Outcolor = emission + diffuse_coef * texColor0 * 0.8 + 0.3 * texColor0 + specular_coef * (0.01*texColor0); 
+  	Outcolor = emission + diffuse_coef * texColor0 * 0.5 + 0.2 * texColor0 + specular_coef * (0.01*texColor0); 
 
 	  //
 	  //specular_coef * (0.5*texColor0)

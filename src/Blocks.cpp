@@ -31,8 +31,6 @@ Blocks::Blocks() {
 	texProg->setVerbose(true);
 	texProg->setShaderNames(resourceDir + "/tex_vert.vert",
 							resourceDir + "/tex_frag0.frag");
-	// texProg->setShaderNames(resourceDir + "/simple_vert.vert",
-	// 						 resourceDir + "/simple_frag.frag");
 	texProg->init();
 	texProg->addUniform("P");
 	texProg->addUniform("V");
@@ -42,21 +40,6 @@ Blocks::Blocks() {
 	texProg->addAttribute("vertPos");
 	texProg->addAttribute("vertNor");
 	texProg->addAttribute("vertTex");
-
-		texProg->addUniform("MatDif");
-		texProg->addUniform("MatSpec");
-		texProg->addUniform("MatAmb");
-		texProg->addUniform("P");
-		texProg->addUniform("V");
-		texProg->addUniform("M");
-		texProg->addUniform("MatAmb");
-		texProg->addUniform("lightPos");
-		texProg->addAttribute("vertPos");
-		texProg->addAttribute("vertNor");
-
-		texProg->addUniform("MatDif");
-		texProg->addUniform("MatSpec");
-		texProg->addUniform("MatShine");
 }
 
 /**
@@ -87,8 +70,8 @@ vec4 Blocks::coords(int x, int y) {
  */
 vector<float> Blocks::vectorFromCoords(vec4 v1, vec4 v2, vec4 v3, vec4 v4,
 									   vec4 v5, vec4 v6) {
-	
 	/*
+	For each side, these are the texture coords
 		minx, miny,
 		maxx, miny,
 		minx, maxy,
@@ -125,15 +108,15 @@ vector<float> Blocks::vectorFromCoords(vec4 v1, vec4 v2, vec4 v3, vec4 v4,
 		v6[1], v6[2],
 		v6[0], v6[3],
 		v6[1], v6[3],
-
-		// v1[0], v1[1], v1[2], v1[3],
-		// v2[0], v2[1], v2[2], v2[3],
-		// v3[0], v3[1], v3[2], v3[3],
-		// v4[0], v4[1], v4[2], v4[3],
-		// v5[0], v5[1], v5[2], v5[3],
-		// v6[0], v6[1], v6[2], v6[3],
 	};
 	return vec;
+}
+
+/**
+ * Helper to create a vector from block with same side everywhere 
+ */
+vector<float> Blocks::vectorFromCoords(vec4 side) { 
+	return vectorFromCoords(side, side, side, side, side, side);
 }
 
 /**
@@ -146,62 +129,24 @@ vector<float> Blocks::vectorFromCoords(vec4 v1, vec4 v2, vec4 v3, vec4 v4,
  * - Left side (NEG X)
  */
 vector<float> Blocks::textureCoords(BlockType type) {
-	// float blocks = 16;
-
-	// float block_size = 1.0/blocks;
-	// vector<float> v = {
-	// 	0.5, 0.5,
-	// 	0.5f + block_size, 0.5,
-	// 	0.5, 0.5f + block_size,
-	// 	0.5f + block_size, 0.5f + block_size,
-
-	// 	// TOP (?), POS Y
-	// 	0.5f + block_size, 0.5f + block_size,
-	// 	0.5f + 2*block_size, 0.5f + block_size,
-	// 	0.5f + block_size, 0.5f + 2*block_size,
-	// 	0.5f + 2*block_size, 0.5f + 2*block_size,
-
-	// 	// POS Z
-	// 	0.5f + 2*block_size, 0.5f + 2*block_size,
-	// 	0.5f + 3*block_size, 0.5f + 2*block_size,
-	// 	0.5f + 2*block_size, 0.5f + 3*block_size,
-	// 	0.5f + 3*block_size, 0.5f + 3*block_size,
-
-
-	// 	// BOTTOM, NEG Y
-	// 	0.5f + 3*block_size, 0.5f + 3*block_size,
-	// 	0.5f + 4*block_size, 0.5f + 3*block_size,
-	// 	0.5f + 3*block_size, 0.5f + 4*block_size,
-	// 	0.5f + 4*block_size, 0.5f + 4*block_size,
-
-	// 	// POS X
-	// 	0.5f + 4*block_size, 0.5f + 4*block_size,
-	// 	0.5f + 5*block_size, 0.5f + 4*block_size,
-	// 	0.5f + 4*block_size, 0.5f + 5*block_size,
-	// 	0.5f + 5*block_size, 0.5f + 5*block_size,
-
-	// 	// 0, 0,
-	// 	// block_size, 0,
-	// 	// 0, block_size,
-	// 	// block_size, block_size,
-
-	// 	// NEG X
-	// 	0.5f + 5*block_size, 0.5f + 5*block_size,
-	// 	0.5f + 6*block_size, 0.5f + 5*block_size,
-	// 	0.5f + 5*block_size, 0.5f + 6*block_size,
-	// 	0.5f + 6*block_size, 0.5f + 6*block_size,
-	// };
-	// return v;
 	switch (type) {
-		case grass:
-			return vectorFromCoords(coords(3, 15),
-									coords(12, 3),	// Top, just grass
-									coords(3, 15),
-									coords(2, 15),	// Bottom, just dirt
-									coords(3, 15), 
-									coords(3, 15)
+		case grass: {
+			vec4 side = coords(3, 15);
+			vec4 top = coords(12, 3); // just grass
+			vec4 bottom = coords(2, 15); // just dirt
+			return vectorFromCoords(side,
+									top,	// Top, just grass
+									side,
+									bottom,	// Bottom, just dirt
+									side, 
+									side
 								);
-
+		}
+		case stone: {
+			// Same texture for all sides
+			vec4 side = coords(0, 15);
+			return vectorFromCoords(side);
+		}
 		default:
 			break;
 	}
@@ -226,14 +171,10 @@ shared_ptr<Shape> Blocks::loadCube() {
 }
 
 void Blocks::addBlock(BlockType type, int x, int y, int z) {
+	// Save block type in dict to draw same everytime
 	if(block_materials.count(type) == 0) {
 		shared_ptr<Shape> cube = loadCube();
 		vector<float> txtCoords = textureCoords(type);
-
-		cout << "txtCoords: " << endl;
-		for(int i = 0; i < txtCoords.size(); i += 2) {
-			cout << "\t" << txtCoords[i] << ", " << txtCoords[i + 1] << endl;
-		}
 
 		cube->setTexBuf(txtCoords);
 		block_materials.insert(pair<BlockType, shared_ptr<Shape>>(type, cube));
@@ -247,21 +188,9 @@ void Blocks::drawBlocks(shared_ptr<MatrixStack> Model) {
 	this->texProg->bind();
 	this->texture->bind(this->texProg->getUniform("Texture0"));
 
-	float r = 0.1;
-	float g = 0.9;
-	float b = 0.2;
-
-	// Assign reasonable rgb values
-	glUniform3f(texProg->getUniform("MatDif"), r, g, b);
-	glUniform3f(texProg->getUniform("MatSpec"), 0.5 * r, 0.5 * g, 0.5 * b);
-	glUniform3f(texProg->getUniform("MatAmb"), 0.3 * r, 0.3 * g, 0.3 * b);
-
 	for (auto block : blocks){
-		// cout << "Draw (" << block.x << ", " << block.y << ", " << block.z << ")" << endl;
 		block.draw(Model, this->texProg);
 	}
-
-	// cout << "Drawn all" << endl;
 
 	this->texProg->unbind();
 }
