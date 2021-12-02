@@ -93,7 +93,7 @@ class Application : public EventCallbacks {
 
 	bool is_entering = false;
 
-	float speed = 0.01f;
+	float speed = 0.05f;
 
 	// Every render, add this to current pos etc.
 	// When pressing down key to move, update to contain
@@ -105,7 +105,10 @@ class Application : public EventCallbacks {
 
 		vec3 w_vec = normalize(gaze);
 		vec3 u_vec = cross(camera_up_vector, w_vec);
-		// vec3 v_vec = cross(w, u);
+		
+		// Don't alow character to move around in y-space freely, only in xz plane
+		u_vec.y = 0;
+		w_vec.y = 0;
 
 		u_diff += movement.x * u_vec;
 		w_diff += movement.y * w_vec;
