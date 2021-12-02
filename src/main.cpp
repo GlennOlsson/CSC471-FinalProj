@@ -105,8 +105,9 @@ class Application : public EventCallbacks {
 
 		vec3 w_vec = normalize(gaze);
 		vec3 u_vec = cross(camera_up_vector, w_vec);
-		
-		// Don't alow character to move around in y-space freely, only in xz plane
+
+		// Don't alow character to move around in y-space freely, only in xz
+		// plane
 		u_vec.y = 0;
 		w_vec.y = 0;
 
@@ -129,51 +130,30 @@ class Application : public EventCallbacks {
 
 		// u ≈ x, w ≈ z
 		if (key == GLFW_KEY_W) {
-			if (action == GLFW_PRESS) {
+			if (action == GLFW_PRESS)
 				movement = vec2(movement.x, speed);
-				// calculateDiff(0, speed);
-			}
-			else if(action == GLFW_RELEASE) {
+			else if (action == GLFW_RELEASE)
 				movement = vec2(movement.x, 0);
-			}
 		}
 		if (key == GLFW_KEY_S) {
-			if (action == GLFW_PRESS) {
+			if (action == GLFW_PRESS)
 				movement = vec2(movement.x, -speed);
-				// calculateDiff(0, speed);
-			}
-			else if(action == GLFW_RELEASE) {
+			else if (action == GLFW_RELEASE)
 				movement = vec2(movement.x, 0);
-			}
 		}
 
-		if (key == GLFW_KEY_A){
-			if (action == GLFW_PRESS) {
+		if (key == GLFW_KEY_A) {
+			if (action == GLFW_PRESS)
 				movement = vec2(speed, movement.y);
-				// calculateDiff(0, speed);
-			}
-			else if(action == GLFW_RELEASE) {
+			else if (action == GLFW_RELEASE)
 				movement = vec2(0, movement.y);
-			}
 		}
-		if (key == GLFW_KEY_D){
-			if (action == GLFW_PRESS) {
+		if (key == GLFW_KEY_D) {
+			if (action == GLFW_PRESS)
 				movement = vec2(-speed, movement.y);
-				// calculateDiff(0, speed);
-			}
-			else if(action == GLFW_RELEASE) {
+			else if (action == GLFW_RELEASE)
 				movement = vec2(0, movement.y);
-			}
 		}
-		// if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-		// 	calculateDiff(0, -speed);
-		// }
-		// if (key == GLFW_KEY_A && action == GLFW_PRESS) {
-		// 	calculateDiff(speed, 0);
-		// }
-		// if (key == GLFW_KEY_D && action == GLFW_PRESS) {
-		// 	calculateDiff(-speed, 0);
-		// }
 
 		if (key == GLFW_KEY_G && action == GLFW_PRESS) {
 			is_entering = true;
@@ -292,10 +272,9 @@ class Application : public EventCallbacks {
 
 		setFloorTexture();
 
-		//Start and end at same point
-		path = Spline(camera_position, glm::vec3(20, gCamH, 20), 
-				glm::vec3(-20, gCamH, 20), camera_position, 10);
-
+		// Start and end at same point
+		path = Spline(camera_position, glm::vec3(20, gCamH, 20),
+					  glm::vec3(-20, gCamH, 20), camera_position, 10);
 	}
 
 	void initGeom() {
@@ -517,23 +496,23 @@ class Application : public EventCallbacks {
 		drawBlock(x, 4, z, Model, Material(current_material));
 
 		// Middle leaves
-		drawBlock(x-1, 3, z, Model, leaves);
+		drawBlock(x - 1, 3, z, Model, leaves);
 		drawBlock(x, 3, z, Model, leaves);
-		drawBlock(x+1, 3, z, Model, leaves);
-		drawBlock(x, 3, z+1, Model, leaves);
-		drawBlock(x, 3, z-1, Model, leaves);
+		drawBlock(x + 1, 3, z, Model, leaves);
+		drawBlock(x, 3, z + 1, Model, leaves);
+		drawBlock(x, 3, z - 1, Model, leaves);
 
 		// Bottom leaves
-		drawBlock(x-1, 2, z, Model, leaves);
+		drawBlock(x - 1, 2, z, Model, leaves);
 		drawBlock(x, 2, z, Model, leaves);
-		drawBlock(x+1, 2, z, Model, leaves);
-		drawBlock(x, 2, z+1, Model, leaves);
-		drawBlock(x, 2, z-1, Model, leaves);
+		drawBlock(x + 1, 2, z, Model, leaves);
+		drawBlock(x, 2, z + 1, Model, leaves);
+		drawBlock(x, 2, z - 1, Model, leaves);
 
-		drawBlock(x+1, 2, z-1, Model, leaves);
-		drawBlock(x-1, 2, z-1, Model, leaves);
-		drawBlock(x+1, 2, z+1, Model, leaves);
-		drawBlock(x-1, 2, z+1, Model, leaves);
+		drawBlock(x + 1, 2, z - 1, Model, leaves);
+		drawBlock(x - 1, 2, z - 1, Model, leaves);
+		drawBlock(x + 1, 2, z + 1, Model, leaves);
+		drawBlock(x - 1, 2, z + 1, Model, leaves);
 
 		// Stem
 		drawBlock(x, 1, z, Model, wood);
@@ -557,14 +536,16 @@ class Application : public EventCallbacks {
 		auto Projection = make_shared<MatrixStack>();
 		auto Model = make_shared<MatrixStack>();
 
-		if(path.isDone())
+		if (path.isDone())
 			is_entering = false;
-		else if(is_entering)
+		else if (is_entering)
 			path.update(frametime);
 
 		vec3 camera_location = path.getPosition();
 
-		auto view = value_ptr(lookAt(camera_location + w_diff + u_diff, lookat + w_diff + u_diff, camera_up_vector));
+		auto view =
+			value_ptr(lookAt(camera_location + w_diff + u_diff,
+							 lookat + w_diff + u_diff, camera_up_vector));
 
 		// Apply perspective projection.
 		Projection->pushMatrix();
@@ -652,14 +633,13 @@ class Application : public EventCallbacks {
 		// switch shaders to the texture mapping shader and draw the ground
 		texProg->bind();
 
-
-		//Draw dome (sky)
+		// Draw dome (sky)
 		Model->pushMatrix();
-			Model->scale(vec3(40, 40, 40));
-			glUniform1i(texProg->getUniform("flip"), -1);
-			sky->bind(texProg->getUniform("Texture0"));
-			setModel(texProg, Model);
-			sphere->draw(texProg);
+		Model->scale(vec3(40, 40, 40));
+		glUniform1i(texProg->getUniform("flip"), -1);
+		sky->bind(texProg->getUniform("Texture0"));
+		setModel(texProg, Model);
+		sphere->draw(texProg);
 		Model->popMatrix();
 
 		glUniformMatrix4fv(texProg->getUniform("P"), 1, GL_FALSE,
@@ -716,7 +696,7 @@ int main(int argc, char *argv[]) {
 		float deltaTime =
 			chrono::duration_cast<std::chrono::microseconds>(now - last_time)
 				.count();
-		
+
 		deltaTime *= 0.000001;
 
 		last_time = now;
