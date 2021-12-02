@@ -262,7 +262,14 @@ class Application : public EventCallbacks {
 		// blocks->texProg = texProg;
 
 		// blocks->addBlock(grass, 5, 1, -11);
-		blocks->addBlock(grass, 5, 0, 3); // Same location as liht
+		// blocks->addBlock(grass, 5, 0, 3); // Same location as liht
+
+		//Create ground
+		for(int i = -10; i < 10; ++i) {
+			for(int j = -10; j < 10; ++j) {
+				blocks->addBlock(grass, i, -1, j);
+			}
+		}
 
 		// TODO: REMOVE
 		// Initialize the GLSL program that we will use for texture mapping
