@@ -45,8 +45,7 @@ class Application : public EventCallbacks {
 	// our geometry
 	shared_ptr<Shape> sphere;
 
-	shared_ptr<Shape> theBunny;
-	shared_ptr<Shape> bunnyNoNorm;
+	shared_ptr<Shape> creeper;
 
 	// shared_ptr<Shape> cube;
 
@@ -57,8 +56,7 @@ class Application : public EventCallbacks {
 	// ground VAO
 	// GLuint GroundVertexArrayID;
 
-	// the image to use as a texture (ground)
-	shared_ptr<Texture> texture0;
+	shared_ptr<Texture> creeper_texture;
 
 	// the image to use as a texture (sky)
 	shared_ptr<Texture> sky;
@@ -307,6 +305,12 @@ class Application : public EventCallbacks {
 		sky->setUnit(1);
 		sky->setWrapModes(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 
+		creeper_texture = make_shared<Texture>();
+		creeper_texture->setFilename(resourceDir + "/creeper.jpg");
+		creeper_texture->init();
+		creeper_texture->setUnit(1);
+		creeper_texture->setWrapModes(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+
 		// Start and end at same point
 		path = Spline(camera_position, glm::vec3(20, gCamH, 20),
 					  glm::vec3(-20, gCamH, 20), camera_position, 10);
@@ -341,6 +345,21 @@ class Application : public EventCallbacks {
 		sphere_max.x = sphere->max.x;
 		sphere_max.y = sphere->max.y;
 		sphere_max.z = sphere->max.z;
+
+		vector<tinyobj::shape_t> TOshapes2;
+		vector<tinyobj::material_t> objMaterials2;
+		errStr;
+		// load in the mesh and make the shape(s)
+		rc = tinyobj::LoadObj(TOshapes2, objMaterials2, errStr,
+								   (resourceDir + "/creeper.obj").c_str());
+		if (!rc) {
+			cerr << errStr << endl;
+		} else {
+			creeper = make_shared<Shape>();
+			creeper->createShape(TOshapes2[1]);
+			creeper->measure();
+			creeper->init();
+		}
 	}
 
 	/* helper function to set model trasnforms */
@@ -429,6 +448,16 @@ class Application : public EventCallbacks {
 
 		prog->unbind();
 
+		blocks->texProg->bind();
+
+		creeper_texture->bind(blocks->texProg->getUniform("Texture0"));
+
+		setModel(blocks->texProg, Model);
+
+		creeper->draw(blocks->texProg);
+
+		blocks->texProg->unbind();
+
 		// Draw all blocks
 		blocks->drawBlocks(Model);
 
@@ -436,6 +465,7 @@ class Application : public EventCallbacks {
 
 		//Draw scene for texture
 		blocks->texProg->bind();
+		
 		glUniformMatrix4fv(blocks->texProg->getUniform("P"), 1, GL_FALSE,
 						   value_ptr(Projection->topMatrix()));
 		glUniformMatrix4fv(blocks->texProg->getUniform("V"), 1, GL_FALSE, view);
