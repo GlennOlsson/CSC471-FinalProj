@@ -215,7 +215,7 @@ class Application : public EventCallbacks {
 	}
 
 	void setFloorTexture() {
-		string file = "minecraft_textures.png";
+		string file = "minecraft_textures.jpg";
 
 		texture0 = make_shared<Texture>();
 		texture0->setFilename(resourceDir + "/" + file);
@@ -325,37 +325,81 @@ class Application : public EventCallbacks {
 
 			float blocks = 16;
 
+			float block_size = 1.0/blocks;
+
 			//two per vertex, in order
 			vector<float> cube_texture_coords = {
-				0.0, 0.0,
-				1.0, 0.0,
-				0.0, 1.0,
-				1.0, 1.0,
+				// 0, 0,
+				// 1, 0,
+				// 0, 1,
+				// 1, 1,
 
-				0.0, 0.0,
-				1.0, 0.0,
-				0.0, 1.0,
-				1.0, 1.0,
+				// 0, 0,
+				// 1, 0,
+				// 0, 1,
+				// 1, 1,
 
-				0.0, 0.0,
-				1.0, 0.0,
-				0.0, 1.0,
-				1.0, 1.0,
+				// 0, 0,
+				// 1, 0,
+				// 0, 1,
+				// 1, 1,
 
-				0.0, 0.0,
-				1.0, 0.0,
-				0.0, 1.0,
-				1.0, 1.0,
+				// 0, 0,
+				// 1, 0,
+				// 0, 1,
+				// 1, 1,
 
-				0.0, 0.0,
-				1.0, 0.0,
-				0.0, 1.0,
-				1.0, 1.0,
+				// 0, 0,
+				// 1, 0,
+				// 0, 1,
+				// 1, 1,
 
-				0.0, 0.0,
-				1.0, 0.0,
-				0.0, 1.0,
-				1.0, 1.0
+				// 0, 0,
+				// 1, 0,
+				// 0, 1,
+				// 1, 1
+
+				// - NEG Z
+				0.5, 0.5,
+				0.5f + block_size, 0.5,
+				0.5, 0.5f + block_size,
+				0.5f + block_size, 0.5f + block_size,
+
+				// TOP (?), POS Y
+				0.5f + block_size, 0.5f + block_size,
+				0.5f + 2*block_size, 0.5f + block_size,
+				0.5f + block_size, 0.5f + 2*block_size,
+				0.5f + 2*block_size, 0.5f + 2*block_size,
+
+				// POS Z
+				0.5f + 2*block_size, 0.5f + 2*block_size,
+				0.5f + 3*block_size, 0.5f + 2*block_size,
+				0.5f + 2*block_size, 0.5f + 3*block_size,
+				0.5f + 3*block_size, 0.5f + 3*block_size,
+
+
+				// BOTTOM, NEG Y
+				0.5f + 3*block_size, 0.5f + 3*block_size,
+				0.5f + 4*block_size, 0.5f + 3*block_size,
+				0.5f + 3*block_size, 0.5f + 4*block_size,
+				0.5f + 4*block_size, 0.5f + 4*block_size,
+
+				// POS X
+				0.5f + 4*block_size, 0.5f + 4*block_size,
+				0.5f + 5*block_size, 0.5f + 4*block_size,
+				0.5f + 4*block_size, 0.5f + 5*block_size,
+				0.5f + 5*block_size, 0.5f + 5*block_size,
+
+				// 0, 0,
+				// block_size, 0,
+				// 0, block_size,
+				// block_size, block_size,
+
+				// NEG X
+				0.5f + 5*block_size, 0.5f + 5*block_size,
+				0.5f + 6*block_size, 0.5f + 5*block_size,
+				0.5f + 5*block_size, 0.5f + 6*block_size,
+				0.5f + 6*block_size, 0.5f + 6*block_size,
 				
 				// 0, 1,
 				// 0, 0,
@@ -656,6 +700,9 @@ class Application : public EventCallbacks {
 			path.update(frametime);
 
 		vec3 camera_location = path.getPosition();
+
+		vec3 tmp = (camera_location + w_diff + u_diff);
+		cout << "current location: " << tmp.x << ", " << tmp.y << ", " << tmp.z << endl;
 
 		auto view =
 			value_ptr(lookAt(camera_location + w_diff + u_diff,
