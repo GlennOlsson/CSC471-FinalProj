@@ -329,10 +329,27 @@ class Application : public EventCallbacks {
 				0, 0,
 				1, 0,
 				1, 1,
-				1, 1,
-				1, 0,
+
+				0, 1,
 				0, 0,
-				0, 1
+				1, 0,
+				1, 1,
+
+
+				0, 1,
+				0, 0,
+				1, 0,
+				1, 1,
+
+				0, 1,
+				0, 0,
+				1, 0,
+				1, 1,
+
+				// 1, 1,
+				// 1, 0,
+				// 0, 0,
+				// 0, 1,
 			};
 
 			cube->setTexBuf(cube_texture_coords);
@@ -379,7 +396,6 @@ class Application : public EventCallbacks {
 
 		// generate the ground VAO
 		glGenVertexArrays(1, &GroundVertexArrayID);
-		
 
 		g_GiboLen = 6;
 		glGenBuffers(1, &GrndBuffObj);
@@ -390,17 +406,15 @@ class Application : public EventCallbacks {
 		glBindBuffer(GL_ARRAY_BUFFER, GrndNorBuffObj);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(GrndNorm), GrndNorm,
 					 GL_STATIC_DRAW);
+		
+		glGenBuffers(1, &GrndTexBuffObj);
+		glBindBuffer(GL_ARRAY_BUFFER, GrndTexBuffObj);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(GrndTex), GrndTex, GL_STATIC_DRAW);
 
 		glGenBuffers(1, &GIndxBuffObj);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GIndxBuffObj);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(idx), idx, GL_STATIC_DRAW);
 
-
-		// glBindVertexArray(cube->vaoID);
-
-		// glGenBuffers(1, &cube_texture_buffer);
-		// glBindBuffer(GL_ARRAY_BUFFER, cube_texture_buffer);
-		// glBufferData(GL_ARRAY_BUFFER, sizeof(cube_texture_coords), cube_texture_coords, GL_STATIC_DRAW);
 	}
 
 	// code to draw the ground plane
@@ -431,13 +445,6 @@ class Application : public EventCallbacks {
 		glDisableVertexAttribArray(2);
 		curS->unbind();
 	}
-
-	// void drawCube(shared_ptr<Program> curS) {
-	// 	curS->bind();
-	// 	texture0->bind(curS->getUniform("Texture0"));
-		
-	// 	curS->unbind();
-	// }
 
 	// helper function to pass material data to the GPU
 	void SetMaterial(shared_ptr<Program> curS, Material m) {
@@ -518,25 +525,13 @@ class Application : public EventCallbacks {
 
 		Model->translate(vec3(x - 0.5, y - 0.5, z - 0.5));
 
-		// SetMaterial(texProg, m);
-
 		setModel(texProg, Model);
-
-
-		// // Bind to VAO
-		// glBindVertexArray(cube->vaoID);
-
-		// // Bind buffer to attribute
-		// glEnableVertexAttribArray(2);
-		// glBindBuffer(GL_ARRAY_BUFFER, cube_texture_buffer);
-		// glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 		cube->draw(texProg);
 
 		Model->popMatrix();
 
 		texProg->unbind();
-
 	}
 
 	void drawTree(int x, int z, shared_ptr<MatrixStack> Model) {
@@ -669,7 +664,7 @@ class Application : public EventCallbacks {
 
 		for (int x = minX; x <= maxX; x++) {
 			// f(x) = -k * (x - midX)^2 + maxY
-			// Solve with f(minX) = 0
+			// Solve knowing f(minX) = 0
 
 			int f_of_x = -k * pow(x - minX, 2) + maxY;
 
