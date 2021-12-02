@@ -114,8 +114,8 @@ class Application : public EventCallbacks {
 
 		// Don't alow character to move around in y-space freely, only in xz
 		// plane
-		u_vec.y = 0;
-		w_vec.y = 0;
+		// u_vec.y = 0;
+		// w_vec.y = 0;
 
 		u_diff += movement.x * u_vec;
 		w_diff += movement.y * w_vec;
@@ -217,6 +217,26 @@ class Application : public EventCallbacks {
 		glViewport(0, 0, width, height);
 	}
 
+	void setupTree(int x, int y, int z) {
+		int stemHeight = 3;
+		for(int height = y; height < (y + stemHeight); ++height) {
+			blocks->addBlock(wood, x, height, z);
+		}
+
+		blocks->addBlock(leave, x + 1,  y + stemHeight, z);
+		blocks->addBlock(leave, x - 1,  y + stemHeight, z);
+		blocks->addBlock(leave, x,  y + stemHeight, z + 1);
+		blocks->addBlock(leave, x,  y + stemHeight, z - 1);
+
+		blocks->addBlock(leave, x + 1,  y + stemHeight + 1, z);
+		blocks->addBlock(leave, x - 1,  y + stemHeight + 1, z);
+		blocks->addBlock(leave, x,  y + stemHeight + 1, z + 1);
+		blocks->addBlock(leave, x,  y + stemHeight + 1, z - 1);
+
+		blocks->addBlock(leave, x,  y + stemHeight + 2, z);
+
+	}
+
 	void setupBlocks() {
 		//Create ground
 		for(int i = -10; i < 10; ++i) {
@@ -246,6 +266,8 @@ class Application : public EventCallbacks {
 				blocks->addBlock(stone, x, y, -9);
 			}
 		}
+
+		setupTree(-2, 0, -2);
 	}
 
 	void init() {

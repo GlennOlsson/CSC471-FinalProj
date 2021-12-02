@@ -135,9 +135,9 @@ vector<float> Blocks::textureCoords(BlockType type) {
 			vec4 top = coords(12, 3); // just grass
 			vec4 bottom = coords(2, 15); // just dirt
 			return vectorFromCoords(side,
-									top,	// Top, just grass
+									top,
 									side,
-									bottom,	// Bottom, just dirt
+									bottom,
 									side, 
 									side
 								);
@@ -145,6 +145,23 @@ vector<float> Blocks::textureCoords(BlockType type) {
 		case stone: {
 			// Same texture for all sides
 			vec4 side = coords(0, 15);
+			return vectorFromCoords(side);
+		}
+		case wood: {
+			// Same texture for all sides
+			vec4 side = coords(4, 14);
+			vec4 topBottom = coords(5, 14);
+			return vectorFromCoords(side,
+									topBottom,
+									side,
+									topBottom,
+									side, 
+									side
+								);
+		}
+		case leave: {
+			// Same texture for all sides
+			vec4 side = coords(5, 12);
 			return vectorFromCoords(side);
 		}
 		default:
