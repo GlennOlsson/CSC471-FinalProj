@@ -93,17 +93,22 @@ class Application : public EventCallbacks {
 
 	bool is_entering = false;
 
-	float speed = 1.0f;
+	float speed = 0.01f;
 
-	void calculateDiff(float u, float w) {
+	// Every render, add this to current pos etc.
+	// When pressing down key to move, update to contain
+	// corresponding value. When releasing, set that to 0
+	vec2 movement;
+
+	void calculateDiff() {
 		vec3 gaze = lookat - camera_position;
 
 		vec3 w_vec = normalize(gaze);
 		vec3 u_vec = cross(camera_up_vector, w_vec);
 		// vec3 v_vec = cross(w, u);
 
-		u_diff += u * u_vec;
-		w_diff += w * w_vec;
+		u_diff += movement.x * u_vec;
+		w_diff += movement.y * w_vec;
 	}
 
 	void keyCallback(GLFWwindow *window, int key, int scancode, int action,
@@ -120,18 +125,52 @@ class Application : public EventCallbacks {
 		}
 
 		// u ≈ x, w ≈ z
-		if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-			calculateDiff(0, speed);
+		if (key == GLFW_KEY_W) {
+			if (action == GLFW_PRESS) {
+				movement = vec2(movement.x, speed);
+				// calculateDiff(0, speed);
+			}
+			else if(action == GLFW_RELEASE) {
+				movement = vec2(movement.x, 0);
+			}
 		}
-		if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-			calculateDiff(0, -speed);
+		if (key == GLFW_KEY_S) {
+			if (action == GLFW_PRESS) {
+				movement = vec2(movement.x, -speed);
+				// calculateDiff(0, speed);
+			}
+			else if(action == GLFW_RELEASE) {
+				movement = vec2(movement.x, 0);
+			}
 		}
-		if (key == GLFW_KEY_A && action == GLFW_PRESS) {
-			calculateDiff(speed, 0);
+
+		if (key == GLFW_KEY_A){
+			if (action == GLFW_PRESS) {
+				movement = vec2(speed, movement.y);
+				// calculateDiff(0, speed);
+			}
+			else if(action == GLFW_RELEASE) {
+				movement = vec2(0, movement.y);
+			}
 		}
-		if (key == GLFW_KEY_D && action == GLFW_PRESS) {
-			calculateDiff(-speed, 0);
+		if (key == GLFW_KEY_D){
+			if (action == GLFW_PRESS) {
+				movement = vec2(-speed, movement.y);
+				// calculateDiff(0, speed);
+			}
+			else if(action == GLFW_RELEASE) {
+				movement = vec2(0, movement.y);
+			}
 		}
+		// if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+		// 	calculateDiff(0, -speed);
+		// }
+		// if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+		// 	calculateDiff(speed, 0);
+		// }
+		// if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+		// 	calculateDiff(-speed, 0);
+		// }
 
 		if (key == GLFW_KEY_G && action == GLFW_PRESS) {
 			is_entering = true;
@@ -499,6 +538,7 @@ class Application : public EventCallbacks {
 	}
 
 	void render(float frametime) {
+		calculateDiff();
 		// Get current frame buffer size.
 		int width, height;
 		glfwGetFramebufferSize(windowManager->getHandle(), &width, &height);
