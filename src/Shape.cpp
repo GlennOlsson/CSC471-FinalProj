@@ -132,6 +132,16 @@ void Shape::init() {
 	CHECKED_GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }
 
+void Shape::setTexBuf(std::vector<float> texBuf) {
+	this->texBuf = texBuf;
+
+	CHECKED_GL_CALL(glGenBuffers(1, &texBufID));
+	CHECKED_GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, texBufID));
+	CHECKED_GL_CALL(glBufferData(GL_ARRAY_BUFFER,
+									texBuf.size() * sizeof(float), &texBuf[0],
+									GL_STATIC_DRAW));
+}
+
 void Shape::draw(const shared_ptr<Program> prog) const {
 	int h_pos, h_nor, h_tex;
 	h_pos = h_nor = h_tex = -1;

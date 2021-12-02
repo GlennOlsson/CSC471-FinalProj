@@ -23,8 +23,12 @@ public:
 	void measure();
 	void draw(const std::shared_ptr<Program> prog) const;
 
+	unsigned int vaoID = 0;
+
 	glm::vec3 min = glm::vec3(0);
 	glm::vec3 max = glm::vec3(0);
+
+	void setTexBuf(std::vector<float> texBuf);
 
 private:
 
@@ -36,7 +40,6 @@ private:
 	unsigned int posBufID = 0;
 	unsigned int norBufID = 0;
 	unsigned int texBufID = 0;
-	unsigned int vaoID = 0;
 
 	void calculateNormals();
 

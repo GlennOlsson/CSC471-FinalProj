@@ -16,6 +16,7 @@
 #include "Spline.h"
 #include "Texture.h"
 #include "WindowManager.h"
+#include <vector>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader/tiny_obj_loader.h>
@@ -99,6 +100,8 @@ class Application : public EventCallbacks {
 	// When pressing down key to move, update to contain
 	// corresponding value. When releasing, set that to 0
 	vec2 movement;
+
+	GLuint cube_texture_buffer;
 
 	void calculateDiff() {
 		vec3 gaze = lookat - camera_position;
@@ -212,7 +215,7 @@ class Application : public EventCallbacks {
 	}
 
 	void setFloorTexture() {
-		string file = "grass.jpg";
+		string file = "crate.jpg";
 
 		texture0 = make_shared<Texture>();
 		texture0->setFilename(resourceDir + "/" + file);
@@ -319,6 +322,20 @@ class Application : public EventCallbacks {
 			cube->createShape(TOshapesB[0]);
 			cube->measure();
 			cube->init();
+
+			//two per vertex, in order
+			vector<float> cube_texture_coords = {
+				0, 1,
+				0, 0,
+				1, 0,
+				1, 1,
+				1, 1,
+				1, 0,
+				0, 0,
+				0, 1
+			};
+
+			cube->setTexBuf(cube_texture_coords);
 		}
 
 		cube_min.x = cube->min.x;
@@ -343,17 +360,26 @@ class Application : public EventCallbacks {
 						   g_groundSize,  g_groundY, g_groundSize,
 						   g_groundSize,  g_groundY, -g_groundSize};
 
-		float GrndNorm[] = {0, 1, 0, 0, 1, 0, 0, 1, 0,
-							0, 1, 0, 0, 1, 0, 0, 1, 0};
+		float GrndNorm[] = {0, 1, 0, 
+							0, 1, 0, 
+							0, 1, 0,
+							0, 1, 0, 
+							0, 1, 0, 
+							0, 1, 0
+		};
 
+		// Texture coords: 0-1, ratio of whole image
 		static GLfloat GrndTex[] = {0, 0,  // back
-									0, 1, 1, 1, 1, 0};
+									0, 1, 
+									1, 1, 
+									1, 0};
 
-		unsigned short idx[] = {0, 1, 2, 0, 2, 3};
+		unsigned short idx[] = {0, 1, 2,  //First face
+								0, 2, 3}; //Second face
 
 		// generate the ground VAO
 		glGenVertexArrays(1, &GroundVertexArrayID);
-		glBindVertexArray(GroundVertexArrayID);
+		
 
 		g_GiboLen = 6;
 		glGenBuffers(1, &GrndBuffObj);
@@ -365,13 +391,16 @@ class Application : public EventCallbacks {
 		glBufferData(GL_ARRAY_BUFFER, sizeof(GrndNorm), GrndNorm,
 					 GL_STATIC_DRAW);
 
-		glGenBuffers(1, &GrndTexBuffObj);
-		glBindBuffer(GL_ARRAY_BUFFER, GrndTexBuffObj);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(GrndTex), GrndTex, GL_STATIC_DRAW);
-
 		glGenBuffers(1, &GIndxBuffObj);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GIndxBuffObj);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(idx), idx, GL_STATIC_DRAW);
+
+
+		// glBindVertexArray(cube->vaoID);
+
+		// glGenBuffers(1, &cube_texture_buffer);
+		// glBindBuffer(GL_ARRAY_BUFFER, cube_texture_buffer);
+		// glBufferData(GL_ARRAY_BUFFER, sizeof(cube_texture_coords), cube_texture_coords, GL_STATIC_DRAW);
 	}
 
 	// code to draw the ground plane
@@ -402,6 +431,13 @@ class Application : public EventCallbacks {
 		glDisableVertexAttribArray(2);
 		curS->unbind();
 	}
+
+	// void drawCube(shared_ptr<Program> curS) {
+	// 	curS->bind();
+	// 	texture0->bind(curS->getUniform("Texture0"));
+		
+	// 	curS->unbind();
+	// }
 
 	// helper function to pass material data to the GPU
 	void SetMaterial(shared_ptr<Program> curS, Material m) {
@@ -475,19 +511,32 @@ class Application : public EventCallbacks {
 	void drawBlock(float x, float y, float z, shared_ptr<MatrixStack> Model,
 				   Material m) {
 		// Cube is one unit in length, from -0.5 to 0.5 all axises
+		texProg->bind();
+		texture0->bind(texProg->getUniform("Texture0"));
+
 		Model->pushMatrix();
 
 		Model->translate(vec3(x - 0.5, y - 0.5, z - 0.5));
 
-		// Model->scale(2);
+		// SetMaterial(texProg, m);
 
-		SetMaterial(prog, m);
+		setModel(texProg, Model);
 
-		setModel(prog, Model);
 
-		cube->draw(prog);
+		// // Bind to VAO
+		// glBindVertexArray(cube->vaoID);
+
+		// // Bind buffer to attribute
+		// glEnableVertexAttribArray(2);
+		// glBindBuffer(GL_ARRAY_BUFFER, cube_texture_buffer);
+		// glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+		cube->draw(texProg);
 
 		Model->popMatrix();
+
+		texProg->unbind();
+
 	}
 
 	void drawTree(int x, int z, shared_ptr<MatrixStack> Model) {
@@ -581,9 +630,12 @@ class Application : public EventCallbacks {
 			Model->translate(vec3(-midX, -midY, -midZ));
 
 			setModel(prog, Model);
+
 			sphere->draw(prog);
 		}
 		Model->popMatrix();
+
+		prog->unbind();
 
 		drawTree(1, -8, Model);
 		drawTree(10, 7, Model);
@@ -628,7 +680,7 @@ class Application : public EventCallbacks {
 
 		Model->popMatrix();
 
-		prog->unbind();
+		// prog->unbind();
 
 		// switch shaders to the texture mapping shader and draw the ground
 		texProg->bind();
