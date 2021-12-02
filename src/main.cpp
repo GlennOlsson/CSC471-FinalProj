@@ -93,7 +93,7 @@ class Application : public EventCallbacks {
 
 	bool is_entering = false;
 
-	float speed = 0.05f;
+	float speed = 0.025f;
 
 	// Every render, add this to current pos etc.
 	// When pressing down key to move, update to contain
