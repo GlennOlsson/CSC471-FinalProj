@@ -55,7 +55,7 @@ void main() {
 
   	// Outcolor = texColor0;
 
-	// Outcolor = vec4(0.5, 0.5 ,0.1, 0.3);
+	// Outcolor = vec4(0.5, 0.5 ,0.1, 0.9);
   
   	//to set the outcolor as the texture coordinate (for debugging)
 	// Outcolor = vec4(vTexCoord.s, vTexCoord.t, 0, 1);

@@ -19,19 +19,22 @@ using namespace glm;
 class Block {
 
 public:
+
+	shared_ptr<Shape> cube;
+
 	// Mid of block
 	int x;
 	int y;
 	int z;
 
-	Block(int x, int y, int z);
+	Block(shared_ptr<Shape> cube, int x, int y, int z);
 
 	/**
 	 * Returns wether or not the point intersects with the blocks bounding spehere 
 	*/
 	bool intersects(float x, float y, float z);
 
-	void draw(shared_ptr<MatrixStack> Model, shared_ptr<Program> textureProgram, shared_ptr<Shape> cube);
+	void draw(shared_ptr<MatrixStack> Model, shared_ptr<Program> textureProgram);
 };
 
 #endif

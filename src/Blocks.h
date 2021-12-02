@@ -1,7 +1,7 @@
 #include "Block.h"
 #include <memory>
 #include <assert.h>
-#include <set>
+#include <vector>
 #include <map>
 
 #include "Texture.h"
@@ -16,16 +16,17 @@ using namespace std;
 using namespace glm;
 
 enum BlockType {
-		grass,
-		dirt,
-		wood,
-		stone
+	grass,
+	dirt,
+	wood,
+	stone
 };
 
 class Blocks {
 private:
+	string resourceDir = "../resources";
 
-	set<Block> blocks;
+	vector<Block> blocks;
 	map<BlockType, shared_ptr<Shape>> block_materials;
 
 	/**
@@ -39,9 +40,10 @@ private:
 
 	vector<float> vectorFromCoords(vec4 v1, vec4 v2, vec4 v3, vec4 v4, vec4 v5, vec4 v6);
 
+	shared_ptr<Shape> loadCube();
+
 public:
 	shared_ptr<Program> texProg;
-	shared_ptr<Shape> cube;
 	shared_ptr<Texture> texture;
 
 	Blocks();

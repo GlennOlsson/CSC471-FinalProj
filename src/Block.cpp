@@ -13,7 +13,9 @@
 using namespace std;
 using namespace glm;
 
-Block::Block(int x, int y, int z) {
+Block::Block(shared_ptr<Shape> cube, int x, int y, int z) {
+	this->cube = cube;
+
 	this->x = x;
 	this->y = y;
 	this->z = z;
@@ -26,7 +28,7 @@ bool Block::intersects(float x, float y, float z) {
 
 }
 
-void Block::draw(shared_ptr<MatrixStack> Model, shared_ptr<Program> textureProgram, shared_ptr<Shape> cube) {
+void Block::draw(shared_ptr<MatrixStack> Model, shared_ptr<Program> textureProgram) {
 	Model->pushMatrix();
 
 	Model->translate(vec3(x - 0.5, y - 0.5, z - 0.5));

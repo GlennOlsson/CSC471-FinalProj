@@ -168,6 +168,8 @@ void Shape::draw(const shared_ptr<Program> prog) const {
 		// Bind texcoords buffer
 		h_tex = prog->getAttribute("vertTex");
 
+		// cout << "Drawing text buffer" << endl;
+
 		if (h_tex != -1 && texBufID != 0) {
 			GLSL::enableVertexAttribArray(h_tex);
 			CHECKED_GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, texBufID));
