@@ -215,7 +215,7 @@ class Application : public EventCallbacks {
 	}
 
 	void setFloorTexture() {
-		string file = "minecraft_textures.jpg";
+		string file = "minecraft.jpg";
 
 		texture0 = make_shared<Texture>();
 		texture0->setFilename(resourceDir + "/" + file);
@@ -700,9 +700,6 @@ class Application : public EventCallbacks {
 			path.update(frametime);
 
 		vec3 camera_location = path.getPosition();
-
-		vec3 tmp = (camera_location + w_diff + u_diff);
-		cout << "current location: " << tmp.x << ", " << tmp.y << ", " << tmp.z << endl;
 
 		auto view =
 			value_ptr(lookAt(camera_location + w_diff + u_diff,
