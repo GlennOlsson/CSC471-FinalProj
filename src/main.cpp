@@ -115,8 +115,8 @@ class Application : public EventCallbacks {
 
 		// Don't alow character to move around in y-space freely, only in xz
 		// plane
-		u_vec.y = 0;
-		w_vec.y = 0;
+		// u_vec.y = 0;
+		// w_vec.y = 0;
 
 		u_diff += movement.x * u_vec;
 		w_diff += movement.y * w_vec;
