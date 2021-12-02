@@ -18,6 +18,8 @@
 #include "WindowManager.h"
 #include <vector>
 
+#include "Blocks.h"
+
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader/tiny_obj_loader.h>
 
@@ -102,6 +104,8 @@ class Application : public EventCallbacks {
 	vec2 movement;
 
 	GLuint cube_texture_buffer;
+
+	Blocks blocks;
 
 	void calculateDiff() {
 		vec3 gaze = lookat - camera_position;
@@ -252,6 +256,9 @@ class Application : public EventCallbacks {
 		prog->addUniform("light_intensity");
 		// prog->addAttribute("diffuse_coef");
 
+		blocks = Blocks();
+
+		// TODO: REMOVE
 		// Initialize the GLSL program that we will use for texture mapping
 		texProg = make_shared<Program>();
 		texProg->setVerbose(true);
