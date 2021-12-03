@@ -112,8 +112,8 @@ class Application : public EventCallbacks {
 
 		// Don't alow character to move around in y-space freely, only in xz
 		// plane
-		// u_vec.y = 0;
-		// w_vec.y = 0;
+		u_vec.y = 0;
+		w_vec.y = 0;
 
 		u_diff += movement.x * u_vec;
 		w_diff += movement.y * w_vec;
@@ -181,7 +181,10 @@ class Application : public EventCallbacks {
 		double posX, posY;
 
 		if (action == GLFW_PRESS) {
-			glfwGetCursorPos(window, &posX, &posY);
+			vec3 lkat = lookat + w_diff + u_diff;
+			cout << "lookat: " << lkat[0] << ", " << lkat[1] << ", " << lkat[2] << endl;
+			blocks->removeAt(lookat + w_diff + u_diff);
+			// glfwGetCursorPos(window, &posX, &posY);
 		}
 	}
 
@@ -261,7 +264,7 @@ class Application : public EventCallbacks {
 			int f_of_x = -k * pow(x - minX, 2) + maxY;
 
 			for (int y = 0; y <= f_of_x; y++) {
-				blocks->addBlock(stone, x, y, -9);
+				// blocks->addBlock(stone, x, y, -9);
 			}
 		}
 
@@ -452,8 +455,12 @@ class Application : public EventCallbacks {
 
 		creeper_texture->bind(blocks->texProg->getUniform("Texture0"));
 
+Model->pushMatrix();
+		Model->translate(vec3(-2, 0, -5));
+		
 		setModel(blocks->texProg, Model);
 
+Model->popMatrix();
 		creeper->draw(blocks->texProg);
 
 		blocks->texProg->unbind();

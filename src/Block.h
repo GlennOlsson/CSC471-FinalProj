@@ -32,7 +32,7 @@ public:
 	/**
 	 * Returns wether or not the point intersects with the blocks bounding spehere 
 	*/
-	bool intersects(float x, float y, float z);
+	float intersects(vec3 point);
 
 	void draw(shared_ptr<MatrixStack> Model, shared_ptr<Program> textureProgram);
 };

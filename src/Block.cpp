@@ -5,6 +5,8 @@
 #include "Shape.h"
 #include "MatrixStack.h"
 
+#include <iostream>
+
 #include <glad/glad.h>
 #include "GLSL.h"
 #include <glm/gtc/matrix_transform.hpp>
@@ -22,10 +24,20 @@ Block::Block(shared_ptr<Shape> cube, int x, int y, int z) {
 }
 
 /**
- * Returns wether or not the point intersects with the blocks bounding spehere 
+ * Returns absolute distance from blocks center to point
 */
-bool Block::intersects(float x, float y, float z) {
+float Block::intersects(vec3 point) {
+	float radius = 1;
 
+	vec3 dist_vec = vec3(this->x, this->y, this->z) - point;
+	float dist = length(dist_vec);
+
+	if(dist < 2 && x == -2) {
+		cout << "coords of close block: " << x << "; " << y << "; " << z << endl;
+		cout << "dist " << dist << endl;
+	} 
+
+	return dist;
 }
 
 void Block::draw(shared_ptr<MatrixStack> Model, shared_ptr<Program> textureProgram) {

@@ -2,7 +2,7 @@
 #include "Block.h"
 #include <memory>
 #include <assert.h>
-#include <vector>
+#include <list>
 #include <iostream>
 
 #include "Texture.h"
@@ -23,7 +23,17 @@ Blocks::Blocks() {
 	texture->setUnit(0);
 	texture->setWrapModes(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 
-	blocks = vector<Block>();
+	blocks = list<shared_ptr<Block>>();
+
+	// 100 x-blocks, 100 z-blocks, 20 y blocks
+	spatial_lookup = vector<vector<vector<shared_ptr<Block>>>>(100);
+	for(int i = 0; i < 100; i++) {
+		spatial_lookup[i] = vector<vector<shared_ptr<Block>>>(20);
+		for(int j = 0; j < 20; j++) {
+			spatial_lookup[i][j] = vector<shared_ptr<Block>>(100);
+		}
+	}
+
 	block_materials = map<BlockType, shared_ptr<Shape>>();
 
 	// Initialize the GLSL program that we will use for texture mapping
@@ -187,6 +197,33 @@ shared_ptr<Shape> Blocks::loadCube() {
 	return cube;
 }
 
+// Returns 3 integers of the indexes in spatial_lookup for the point v
+void Blocks::spatial_coords(vec3 v, int& x, int& y, int& z) {
+	x = round(v[0]);
+	y = round(v[1]);
+	z = round(v[2]);
+
+	x += 50;
+	y += 1;
+	z += 50;
+}
+
+// Returns true if there is a block at position pos
+shared_ptr<Block> Blocks::blockAt(vec3 pos) {
+	int x, y, z;
+	spatial_coords(pos, x, y, z);
+
+	// If bad coords, there can't be blocks there
+	if(x < 0 || x > 100)
+		return nullptr;
+	if(y < 0 || y > 20)
+		return nullptr;
+	if(z < 0 || z > 100)
+		return nullptr;
+	
+	return spatial_lookup[x][y][z];
+}
+
 void Blocks::addBlock(BlockType type, int x, int y, int z) {
 	// Save block type in dict to draw same everytime
 	if(block_materials.count(type) == 0) {
@@ -197,8 +234,36 @@ void Blocks::addBlock(BlockType type, int x, int y, int z) {
 		block_materials.insert(pair<BlockType, shared_ptr<Shape>>(type, cube));
 	}
 
-	Block b = Block(block_materials[type], x, y, z);
+	shared_ptr<Block> b = make_shared<Block>(block_materials[type], x, y, z);
 	blocks.push_back(b);
+
+	x += 50;
+	y += 1;
+	z += 50;
+
+	spatial_lookup[x][y][z] = b;
+}
+
+/**
+ * Removes block at x, y, z if there is a block there. Returns true
+ * if a block was removed, false if there was not block at position
+ */
+bool Blocks::removeAt(vec3 lookat) {
+	shared_ptr<Block> blockat = blockAt(lookat);
+
+	if(blockat == nullptr) {
+		cout << "No block!" << endl;
+		return false;
+	}
+
+	cout << "Yes,  block!" << endl;
+
+	blocks.remove(blockat);
+
+	int x, y, z;
+	spatial_coords(lookat, x, y, z);
+	spatial_lookup[x][y][z] = nullptr;
+	return true;
 }
 
 void Blocks::drawBlocks(shared_ptr<MatrixStack> Model) {
@@ -206,7 +271,7 @@ void Blocks::drawBlocks(shared_ptr<MatrixStack> Model) {
 	this->texture->bind(this->texProg->getUniform("Texture0"));
 
 	for (auto block : blocks){
-		block.draw(Model, this->texProg);
+		block->draw(Model, this->texProg);
 	}
 
 	this->texProg->unbind();
