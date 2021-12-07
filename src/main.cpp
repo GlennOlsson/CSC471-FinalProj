@@ -18,14 +18,15 @@
 #include "WindowManager.h"
 #include <vector>
 
-#include "Blocks.h"
-
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader/tiny_obj_loader.h>
 
 // value_ptr for glm
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "Blocks.h"
+#include "ShapeCreeper.h"
 
 using namespace std;
 using namespace glm;
@@ -45,7 +46,7 @@ class Application : public EventCallbacks {
 	// our geometry
 	shared_ptr<Shape> sphere;
 
-	shared_ptr<Shape> creeper;
+	shared_ptr<ShapeCreeper> creeper;
 
 	// shared_ptr<Shape> cube;
 
@@ -344,14 +345,11 @@ class Application : public EventCallbacks {
 		vector<tinyobj::material_t> objMaterials2;
 		// load in the mesh and make the shape(s)
 		rc = tinyobj::LoadObj(TOshapes2, objMaterials2, errStr,
-								   (resourceDir + "/creeper.obj").c_str());
+								   (resourceDir + "/dummy.obj").c_str());
 		if (!rc) {
 			cerr << errStr << endl;
 		} else {
-			creeper = make_shared<Shape>();
-			creeper->createShape(TOshapes2[1]);
-			creeper->measure();
-			creeper->init();
+			creeper = make_shared<ShapeCreeper>(TOshapes2, blocks->texProg);
 		}
 	}
 
@@ -419,7 +417,8 @@ class Application : public EventCallbacks {
 		Projection->perspective(45.0f, aspect, 0.01f, 100.0f);
 
 		// Multiple use
-		vec3 light_position = vec3(2.0, 2.0, lightTrans);
+		// vec3 light_position = vec3(2.0, 2.0, lightTrans);
+		vec3 light_position = vec3(0);
 
 		// Draw the scene
 		prog->bind();
@@ -459,13 +458,13 @@ class Application : public EventCallbacks {
 
 		creeper_texture->bind(blocks->texProg->getUniform("Texture0"));
 
-Model->pushMatrix();
-		Model->translate(vec3(-2, 0, -5));
-		
-		setModel(blocks->texProg, Model);
+		creeper->initPlacement(Model);
 
-Model->popMatrix();
-		creeper->draw(blocks->texProg);
+		// for(auto shape: creeper) {
+		// 	shape->draw(blocks->texProg);
+		// }
+
+		// creeper[curr_shape]->draw(blocks->texProg);
 
 		blocks->texProg->unbind();
 

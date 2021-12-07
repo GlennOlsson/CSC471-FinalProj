@@ -30,7 +30,7 @@ public:
 
 	void setTexBuf(std::vector<float> texBuf);
 
-private:
+protected:
 
 	std::vector<unsigned int> eleBuf;
 	std::vector<float> posBuf;
