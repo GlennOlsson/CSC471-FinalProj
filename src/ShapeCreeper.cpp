@@ -145,6 +145,13 @@ void ShapeCreeper::drawLeftLowerLeg() {
 }
 
 void ShapeCreeper::setModel(shared_ptr<MatrixStack> model) {
+	float r = 0.2;
+	float g = 1;
+	float b = 0.4;
+
+	glUniform3f(prog->getUniform("MatDif"), r, g, b);
+	glUniform3f(prog->getUniform("MatSpec"), 0.5 * r, 0.5 * g, 0.5 * b);
+	glUniform3f(prog->getUniform("MatAmb"), 0.3 * r, 0.3 * g, 0.3 * b);
 	glUniformMatrix4fv(this->prog->getUniform("M"), 1, GL_FALSE,
 						   value_ptr(model->topMatrix()));
 }

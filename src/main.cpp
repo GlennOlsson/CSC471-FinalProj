@@ -79,7 +79,7 @@ class Application : public EventCallbacks {
 	vec3 w_diff = vec3(0);
 	vec3 u_diff = vec3(0);
 
-	float height = 0;
+	float height = 0.5;
 
 	// Lookat will be calculated before first render dependent on phi and theta
 	vec3 lookat;
@@ -356,7 +356,7 @@ class Application : public EventCallbacks {
 		if (!rc) {
 			cerr << errStr << endl;
 		} else {
-			creeper = make_shared<ShapeCreeper>(TOshapes2, blocks->texProg);
+			creeper = make_shared<ShapeCreeper>(TOshapes2, prog);
 		}
 	}
 
@@ -461,19 +461,11 @@ class Application : public EventCallbacks {
 		}
 		Model->popMatrix();
 
+		creeper->initPlacement(Model);
+
 		prog->unbind();
 
 		blocks->texProg->bind();
-
-		creeper_texture->bind(blocks->texProg->getUniform("Texture0"));
-
-		creeper->initPlacement(Model);
-
-		// for(auto shape: creeper) {
-		// 	shape->draw(blocks->texProg);
-		// }
-
-		// creeper[curr_shape]->draw(blocks->texProg);
 
 		blocks->texProg->unbind();
 
