@@ -158,6 +158,11 @@ class Application : public EventCallbacks {
 				movement = vec2(0, movement.y);
 		}
 
+		if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+			vec3 lkat = lookat + w_diff + u_diff;
+			blocks->addBlock(stone, lkat);
+		}
+
 		if (key == GLFW_KEY_G && action == GLFW_PRESS) {
 			is_entering = true;
 		}
@@ -238,29 +243,27 @@ class Application : public EventCallbacks {
 			}
 		}
 
-		// Create rock formationusing quadratic formula
-
-		// minX where y >= 0, i.e. where quadratic equation interesects y plane
-		int minX = -5;
-		int maxX = 9;
-		int midX = minX + (maxX - minX);
-
-		int maxY = 10;
-
-		float k = maxY / pow(minX - midX, 2);
-
-		for (int x = minX; x <= maxX; x++) {
-			// f(x) = -k * (x - midX)^2 + maxY
-			// Solve knowing f(minX) = 0
-
-			int f_of_x = -k * pow(x - minX, 2) + maxY;
-
-			for (int y = 0; y <= f_of_x; y++) {
-				// blocks->addBlock(stone, x, y, -9);
-			}
-		}
-
 		setupTree(-2, 0, 0);
+
+		setupTree(-8, 0, 4);
+
+		setupTree(2, 0, 6);
+
+		blocks->addBlock(grass, 3, 0, 3);
+		blocks->addBlock(grass, 3, 0, 4);
+		blocks->addBlock(grass, 3, 0, 5);
+
+		blocks->addBlock(grass, 4, 0, 3);
+		blocks->addBlock(grass, 4, 0, 4);
+		blocks->addBlock(grass, 4, 0, 5);
+
+		blocks->addBlock(grass, 5, 0, 3);
+		blocks->addBlock(grass, 5, 0, 4);
+		blocks->addBlock(grass, 5, 0, 5);
+
+
+		setupTree(4, 0, 4);
+
 	}
 
 	void init() {

@@ -71,6 +71,7 @@ public:
 	vector<float> textureCoords(BlockType type);
 
 	void addBlock(BlockType type, int x, int y, int z);
+	void addBlock(BlockType type, vec3 v);
 	bool removeAt(vec3 lookat);
 
 	void drawBlocks(shared_ptr<MatrixStack> Model);

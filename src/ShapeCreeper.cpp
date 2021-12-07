@@ -176,16 +176,18 @@ void ShapeCreeper::initPlacement(shared_ptr<MatrixStack> model) {
 
 	vec3 dummy_location = path.getPosition();
 
-	auto dummy_rot_mat = glm::lookAt(last_dummy_loc, dummy_location, vec3(0, 1, 0));
+	// auto dummy_rot_mat = glm::lookAt(last_dummy_loc, dummy_location, vec3(0, 1, 0));
 
 
 	vec3 gaze = normalize(last_dummy_loc - dummy_location);
 	vec3 lookat_pt = dummy_location + gaze;
 
-	float gaze_x = lookat_pt[0];
-	float gaze_y = lookat_pt[2];
+	vec3 u_vec = cross(vec3(0, 1, 0), gaze);
 
-	cout << "gaze x=" << gaze_x << ", y=" << gaze_y << endl;
+	float gaze_x = u_vec[0];
+	float gaze_y = u_vec[2];
+
+	// cout << "gaze x=" << gaze_x << ", y=" << gaze_y << endl;
 
 	float rotate_angle = acos(gaze_x / sqrt(pow(gaze_x, 2) + pow(gaze_y, 2)));
 
@@ -201,9 +203,9 @@ void ShapeCreeper::initPlacement(shared_ptr<MatrixStack> model) {
 		// model->translate(vec3(2, 0, -5 * (-time / 30.0f)));
 		model->translate(dummy_location);
 
-		cout << "rotate " << rotate_angle << endl;
+		// cout << "rotate " << rotate_angle << endl;
 
-		cout << "Dummy loc: " << dummy_location[0] << ", " << dummy_location[1] << ", " << dummy_location[2] << endl;
+		// cout << "Dummy loc: " << dummy_location[0] << ", " << dummy_location[1] << ", " << dummy_location[2] << endl;
 		// cout << "Dummy lookat: " << lookat_pt[0] << ", " << lookat_pt[1] << ", " << lookat_pt[2] << endl;
 
 		// model->lookAt(dummy_location, lookat_pt, vec3(0, 1, 0));
@@ -211,7 +213,7 @@ void ShapeCreeper::initPlacement(shared_ptr<MatrixStack> model) {
 		// model->multMatrix(dummy_rot_mat);
 		model->rotate(-rotate_angle, vec3(0, 1, 0));
 
-		// model->rotate(PI, vec3(0, 1, 0));
+		model->rotate(PI / 2.0f, vec3(0, 1, 0));
 		model->rotate(-PI / 2, vec3(1, 0, 0));
 		model->scale(0.01);
 

@@ -226,6 +226,9 @@ shared_ptr<Block> Blocks::blockAt(vec3 pos) {
 }
 
 void Blocks::addBlock(BlockType type, int x, int y, int z) {
+	if(hasBlockAt(vec3(x, y, z)))
+		return;
+
 	// Save block type in dict to draw same everytime
 	if(block_materials.count(type) == 0) {
 		shared_ptr<Shape> cube = loadCube();
@@ -243,6 +246,10 @@ void Blocks::addBlock(BlockType type, int x, int y, int z) {
 	z += 50;
 
 	spatial_lookup[x][y][z] = b;
+}
+
+void Blocks::addBlock(BlockType type, vec3 v) {
+	addBlock(type, v[0], v[1], v[2]);
 }
 
 /**
