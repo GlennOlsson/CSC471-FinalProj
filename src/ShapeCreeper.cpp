@@ -144,8 +144,7 @@ void ShapeCreeper::initPlacement(shared_ptr<MatrixStack> model) {
 
 		vec3 center = center_of_bounds(bounding_min, bounding_max);
 
-		// model->translate(-center);
-
+		// Move right arm like pendulum
 		model->pushMatrix(); {
 
 			vec3 left_shoulder_max = shapes[14]->max;
@@ -158,13 +157,6 @@ void ShapeCreeper::initPlacement(shared_ptr<MatrixStack> model) {
 			
 			model->translate(vec3(0, arm_center[1] * 0.3f, arm_center[2] * 0.35f));
 
-			// model->translate(left_shoulder_joint);
-
-			
-			// model->translate(vec3(arm_center[0] * 0.5f, 0, arm_center[1] * 0.5f));
-			// model->translate(arm_center * 0.5f);
-
-			// float time = fmodf((float) glfwGetTime(), 10.0f);
 			float time = glfwGetTime();
 
 			float frac = 0.15f * sin(time) + 0.5f;
@@ -185,12 +177,45 @@ void ShapeCreeper::initPlacement(shared_ptr<MatrixStack> model) {
 		}
 		model->popMatrix();
 
+		// Move left arm like pendulum
+		model->pushMatrix(); {
+
+			vec3 right_shoulder_max = shapes[14]->max;
+			vec3 right_shoulder_min = shapes[14]->min;
+			vec3 right_shoulder_center = center_of_bounds(right_shoulder_min, right_shoulder_max);
+			
+			vec3 right_shoulder_joint = vec3(right_shoulder_center[1] / 2.0f, right_shoulder_max[0], right_shoulder_max[2] * 0.95f);
+
+			vec3 arm_center = center_of_bounds(bounding_right_arm_min, bounding_right_arm_max);
+			
+			model->translate(vec3(0, arm_center[1] * 0.3f, arm_center[2] * 0.35f));
+
+			float time = glfwGetTime();
+
+			float frac = -0.15f * sin(time) + 0.5f;
+
+			model->rotate(2 * PI * frac, vec3(0, 1, 0));
+
+			model->rotate(PI * -0.5f, vec3(1, 0, 0));
+
+			// Move to joint (by origin)
+			model->translate(vec3(0, arm_center[1] * 0.6f, 0));
+
+			//Move to center
+			model->translate(-arm_center);
+
+			setModel(model);
+			drawRightArm();
+
+		}
+		model->popMatrix();
+
 		model->pushMatrix(); {
 
 			model->translate(-center);
 			setModel(model);
 
-			drawBetween(0, 20);
+			drawBetween(0, 15);
 			drawBetween(27, 29);
 		}
 		model->popMatrix();
