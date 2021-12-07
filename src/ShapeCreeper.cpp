@@ -145,77 +145,114 @@ void ShapeCreeper::initPlacement(shared_ptr<MatrixStack> model) {
 		vec3 center = center_of_bounds(bounding_min, bounding_max);
 
 		// Move right arm like pendulum
+		// model->pushMatrix(); {
+
+		// 	vec3 left_shoulder_max = shapes[14]->max;
+		// 	vec3 left_shoulder_min = shapes[14]->min;
+		// 	vec3 left_shoulder_center = center_of_bounds(left_shoulder_min, left_shoulder_max);
+			
+		// 	vec3 left_shoulder_joint = vec3(left_shoulder_center[1] / 2.0f, left_shoulder_max[0], left_shoulder_max[2] * 0.95f);
+
+		// 	vec3 arm_center = center_of_bounds(bounding_left_arm_min, bounding_left_arm_max);
+			
+		// 	model->translate(vec3(0, arm_center[1] * 0.3f, arm_center[2] * 0.35f));
+
+		// 	float time = glfwGetTime();
+
+		// 	float frac = 0.15f * sin(time) + 0.5f;
+
+		// 	model->rotate(2 * PI * frac, vec3(0, 1, 0));
+
+		// 	model->rotate(PI * 0.5f, vec3(1, 0, 0));
+
+		// 	// Move to joint (by origin)
+		// 	model->translate(vec3(0, arm_center[1] * 0.6f, 0));
+
+		// 	//Move to center
+		// 	model->translate(-arm_center);
+
+		// 	setModel(model);
+		// 	drawLeftArm();
+
+		// }
+		// model->popMatrix();
+
+		// // Move left arm like pendulum, opposite sync compared to other arm
+		// model->pushMatrix(); {
+
+		// 	vec3 right_shoulder_max = shapes[14]->max;
+		// 	vec3 right_shoulder_min = shapes[14]->min;
+		// 	vec3 right_shoulder_center = center_of_bounds(right_shoulder_min, right_shoulder_max);
+			
+		// 	vec3 right_shoulder_joint = vec3(right_shoulder_center[1] / 2.0f, right_shoulder_max[0], right_shoulder_max[2] * 0.95f);
+
+		// 	vec3 arm_center = center_of_bounds(bounding_right_arm_min, bounding_right_arm_max);
+			
+		// 	model->translate(vec3(0, arm_center[1] * 0.3f, arm_center[2] * 0.35f));
+
+		// 	float time = glfwGetTime();
+
+		// 	float frac = -0.15f * sin(time) + 0.5f;
+
+		// 	model->rotate(2 * PI * frac, vec3(0, 1, 0));
+
+		// 	model->rotate(PI * -0.5f, vec3(1, 0, 0));
+
+		// 	// Move to joint (by origin)
+		// 	model->translate(vec3(0, arm_center[1] * 0.6f, 0));
+
+		// 	//Move to center
+		// 	model->translate(-arm_center);
+
+		// 	setModel(model);
+		// 	drawRightArm();
+
+		// }
+		// model->popMatrix();
+
+		// Right leg
 		model->pushMatrix(); {
-
-			vec3 left_shoulder_max = shapes[14]->max;
-			vec3 left_shoulder_min = shapes[14]->min;
-			vec3 left_shoulder_center = center_of_bounds(left_shoulder_min, left_shoulder_max);
+			vec3 ass_max = shapes[12]->max;
+			vec3 ass_min = shapes[12]->min;
+			vec3 ass_center = center_of_bounds(ass_min, ass_max);
 			
-			vec3 left_shoulder_joint = vec3(left_shoulder_center[1] / 2.0f, left_shoulder_max[0], left_shoulder_max[2] * 0.95f);
+			// vec3 right_ass_joint = vec3(ass_center[0] / 2.0f, ass_max[0], ass_max[2] * 0.95f);
 
-			vec3 arm_center = center_of_bounds(bounding_left_arm_min, bounding_left_arm_max);
+			vec3 leg_center = center_of_bounds(bounding_right_leg_min, bounding_right_leg_max);
 			
-			model->translate(vec3(0, arm_center[1] * 0.3f, arm_center[2] * 0.35f));
-
-			float time = glfwGetTime();
-
-			float frac = 0.15f * sin(time) + 0.5f;
-
-			model->rotate(2 * PI * frac, vec3(0, 1, 0));
-
-			model->rotate(PI * 0.5f, vec3(1, 0, 0));
-
-			// Move to joint (by origin)
-			model->translate(vec3(0, arm_center[1] * 0.6f, 0));
-
-			//Move to center
-			model->translate(-arm_center);
-
-			setModel(model);
-			drawLeftArm();
-
-		}
-		model->popMatrix();
-
-		// Move left arm like pendulum
-		model->pushMatrix(); {
-
-			vec3 right_shoulder_max = shapes[14]->max;
-			vec3 right_shoulder_min = shapes[14]->min;
-			vec3 right_shoulder_center = center_of_bounds(right_shoulder_min, right_shoulder_max);
-			
-			vec3 right_shoulder_joint = vec3(right_shoulder_center[1] / 2.0f, right_shoulder_max[0], right_shoulder_max[2] * 0.95f);
-
-			vec3 arm_center = center_of_bounds(bounding_right_arm_min, bounding_right_arm_max);
-			
-			model->translate(vec3(0, arm_center[1] * 0.3f, arm_center[2] * 0.35f));
+			// model->translate(vec3(0, 0, 0));
+			model->translate(vec3(leg_center[0] * -0.7f, leg_center[1] * 0.9f, leg_center[2] * 0.2f));
 
 			float time = glfwGetTime();
 
 			float frac = -0.15f * sin(time) + 0.5f;
 
-			model->rotate(2 * PI * frac, vec3(0, 1, 0));
+			model->rotate((2.0f * PI * frac) + PI , vec3(0, 1, 0));
 
-			model->rotate(PI * -0.5f, vec3(1, 0, 0));
+			// model->rotate((2.0f * PI * 0.1) + PI , vec3(0, 1, 0));
+
+			// model->rotate(PI * -0.5f, vec3(1, 0, 0));
 
 			// Move to joint (by origin)
-			model->translate(vec3(0, arm_center[1] * 0.6f, 0));
+			model->translate(vec3(leg_center[0] * 0.8f, leg_center[1] * -0.0f, leg_center[2] * -1.0f));
 
 			//Move to center
-			model->translate(-arm_center);
+			model->translate(-leg_center);
 
 			setModel(model);
-			drawRightArm();
+			drawRightLeg();
 
 		}
 		model->popMatrix();
+
+		
 
 		model->pushMatrix(); {
 
 			model->translate(-center);
 			setModel(model);
 
-			drawBetween(0, 15);
+			drawBetween(12, 15);
 			drawBetween(27, 29);
 		}
 		model->popMatrix();

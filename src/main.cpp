@@ -260,7 +260,7 @@ class Application : public EventCallbacks {
 			}
 		}
 
-		setupTree(-2, 0, -2);
+		setupTree(-2, 0, 0);
 	}
 
 	void init() {
