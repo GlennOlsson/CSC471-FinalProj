@@ -159,7 +159,6 @@ class Application : public EventCallbacks {
 		if (action == GLFW_PRESS) {
 			vec3 lkat = lookat + w_diff + u_diff;
 			blocks->removeAt(lookat + w_diff + u_diff);
-			// glfwGetCursorPos(window, &posX, &posY);
 		}
 	}
 
