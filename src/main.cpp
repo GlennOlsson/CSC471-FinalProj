@@ -114,6 +114,10 @@ class Application : public EventCallbacks {
 		u_vec.y = 0;
 		w_vec.y = 0;
 
+		// Normalize without y
+		u_vec = normalize(u_vec);
+		w_vec = normalize(w_vec);
+
 		u_diff += movement.x * u_vec;
 		w_diff += movement.y * w_vec;
 	}

@@ -241,9 +241,7 @@ void Blocks::addBlock(BlockType type, int x, int y, int z) {
 	shared_ptr<Block> b = make_shared<Block>(block_materials[type], x, y, z);
 	blocks.push_back(b);
 
-	x += 50;
-	y += 1;
-	z += 50;
+	spatial_coords(vec3(x, y, z), x, y, z);
 
 	spatial_lookup[x][y][z] = b;
 }
