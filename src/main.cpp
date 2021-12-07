@@ -482,6 +482,8 @@ class Application : public EventCallbacks {
 		glUniformMatrix4fv(blocks->texProg->getUniform("V"), 1, GL_FALSE, view);
 		glUniformMatrix4fv(blocks->texProg->getUniform("M"), 1, GL_FALSE,
 						   value_ptr(Model->topMatrix()));
+		glUniform3f(blocks->texProg->getUniform("lightPos"), light_position.x,
+					light_position.y, light_position.z);
 		blocks->texProg->unbind();
 
 		// Pop matrix stacks.
