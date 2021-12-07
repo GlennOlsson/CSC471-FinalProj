@@ -40,22 +40,10 @@ class Application : public EventCallbacks {
 	// Our shader program - use this one for Blinn-Phong
 	std::shared_ptr<Program> prog;
 
-	// Our shader program for textures
-	// std::shared_ptr<Program> texProg;
-
 	// our geometry
 	shared_ptr<Shape> sphere;
 
 	shared_ptr<ShapeCreeper> creeper;
-
-	// shared_ptr<Shape> cube;
-
-	// global data for ground plane - direct load constant defined CPU data to
-	// GPU (not obj)
-	// GLuint GrndBuffObj, GrndNorBuffObj, GrndTexBuffObj, GIndxBuffObj;
-	// int g_GiboLen;
-	// ground VAO
-	// GLuint GroundVertexArrayID;
 
 	shared_ptr<Texture> creeper_texture;
 
@@ -66,12 +54,8 @@ class Application : public EventCallbacks {
 	vec3 sphere_min;
 	vec3 sphere_max;
 
-	// vec3 cube_min;
-	// vec3 cube_max;
-
 	// animation data
 	float lightTrans = 2;
-	float gTrans = -3;
 
 	float camera_phi = -PI / 4.0f;
 	float camera_theta = 0;
@@ -88,18 +72,12 @@ class Application : public EventCallbacks {
 
 	string resourceDir;
 
-	Spline path;
-
-	bool is_entering = false;
-
 	float speed = 0.015f;
 
 	// Every render, add this to current pos etc.
 	// When pressing down key to move, update to contain
 	// corresponding value. When releasing, set that to 0
 	vec2 movement;
-
-	// GLuint cube_texture_buffer;
 
 	Blocks* blocks;
 
@@ -165,10 +143,6 @@ class Application : public EventCallbacks {
 		if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
 			vec3 lkat = lookat + w_diff + u_diff;
 			blocks->addBlock(stone, lkat);
-		}
-
-		if (key == GLFW_KEY_G && action == GLFW_PRESS) {
-			is_entering = true;
 		}
 
 		if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
@@ -312,19 +286,9 @@ class Application : public EventCallbacks {
 		creeper_texture->init();
 		creeper_texture->setUnit(1);
 		creeper_texture->setWrapModes(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
-
-		// Start and end at same point
-		path = Spline(camera_position, glm::vec3(20, height, 20),
-					  glm::vec3(-20, height, 20), camera_position, 10);
 	}
 
 	void initGeom() {
-		// EXAMPLE set up to read one shape from one obj file - convert to read
-		// several
-		// Initialize mesh
-		// Load geometry
-		// Some obj files contain material information.We'll ignore them for
-		// this assignment.
 		vector<tinyobj::shape_t> TOshapes;
 		vector<tinyobj::material_t> objMaterials;
 		string errStr;
@@ -377,7 +341,7 @@ class Application : public EventCallbacks {
 						   value_ptr(M->topMatrix()));
 	}
 
-	void render(float frametime) {
+	void render() {
 		calculateDiff();
 
 		// Get current frame buffer size.
@@ -395,16 +359,10 @@ class Application : public EventCallbacks {
 		auto Projection = make_shared<MatrixStack>();
 		auto Model = make_shared<MatrixStack>();
 
-		if (path.isDone())
-			is_entering = false;
-		else if (is_entering)
-			path.update(frametime);
-
-		vec3 camera_location = path.getPosition();
+		vec3 camera_location = vec3(0, height, 0);
 
 		vec3 location = camera_location + w_diff + u_diff;
 
-		// cout << "LOC;: " << location[0] << ", " << location[1] << ",  " << location[2] << endl;
 		location[1] = this->height;
 
 		vec3 lookat_pt = lookat + w_diff + u_diff;
@@ -519,23 +477,11 @@ int main(int argc, char *argv[]) {
 
 	application->calculateLookat();
 
-	auto last_time = chrono::high_resolution_clock::now();
-
 	// Loop until the user closes the window.
 	while (!glfwWindowShouldClose(windowManager->getHandle())) {
 		// Render scene.
 
-		auto now = chrono::high_resolution_clock::now();
-
-		float deltaTime =
-			chrono::duration_cast<std::chrono::microseconds>(now - last_time)
-				.count();
-
-		deltaTime *= 0.000001;
-
-		last_time = now;
-
-		application->render(deltaTime);
+		application->render();
 
 		// Swap front and back buffers.
 		glfwSwapBuffers(windowManager->getHandle());
