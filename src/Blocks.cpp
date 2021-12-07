@@ -48,6 +48,7 @@ Blocks::Blocks() {
 	texProg->addUniform("V");
 	texProg->addUniform("M");
 	texProg->addUniform("Texture0");
+	texProg->addUniform("lightPos");
 	texProg->addAttribute("vertPos");
 	texProg->addAttribute("vertNor");
 	texProg->addAttribute("vertTex");
