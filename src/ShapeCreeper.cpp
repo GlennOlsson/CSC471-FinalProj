@@ -18,6 +18,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <GLFW/glfw3.h>
 
+#include <chrono>
+
 #define PI 3.1415
 
 using std::cout;
@@ -41,6 +43,16 @@ void max_min(vec3& body_min, vec3& body_max, vec3& curr_min, vec3& curr_max) {
 	float maxZ = max(body_max[2], curr_max[2]);
 
 	curr_max = vec3(maxX, maxY, maxZ);
+}
+
+void ShapeCreeper::createPath() {
+	// Start and end at same point
+
+	vec3 start_end(-5, 0, -5);
+	vec3 c1(10, 0, 1.5);
+	vec3 c2(6, 0, 8);
+
+	path = Spline(start_end, c1, c2, start_end, 60);
 }
 
 ShapeCreeper::ShapeCreeper(vector<tinyobj::shape_t> s, shared_ptr<Program> prog) {
@@ -99,6 +111,8 @@ ShapeCreeper::ShapeCreeper(vector<tinyobj::shape_t> s, shared_ptr<Program> prog)
 
 		index += 1;
 	}
+
+	createPath();
 }
 
 void ShapeCreeper::drawBetween(int i, int j) {
@@ -144,15 +158,60 @@ vec3 center_of_bounds(vec3 min, vec3 max) {
 }
 
 void ShapeCreeper::initPlacement(shared_ptr<MatrixStack> model) {
+
+	auto now = std::chrono::high_resolution_clock::now();
+
+	float deltaTime =
+		std::chrono::duration_cast<std::chrono::microseconds>(now - last_time)
+			.count();
+
+	deltaTime *= 0.000001;
+
+	last_time = now;
+
+	path.update(deltaTime);
+
+	if (path.isDone())
+		createPath();
+
+	vec3 dummy_location = path.getPosition();
+
+	auto dummy_rot_mat = glm::lookAt(last_dummy_loc, dummy_location, vec3(0, 1, 0));
+
+
+	vec3 gaze = normalize(last_dummy_loc - dummy_location);
+	vec3 lookat_pt = dummy_location + gaze;
+
+	float gaze_x = lookat_pt[0];
+	float gaze_y = lookat_pt[2];
+
+	cout << "gaze x=" << gaze_x << ", y=" << gaze_y << endl;
+
+	float rotate_angle = acos(gaze_x / sqrt(pow(gaze_x, 2) + pow(gaze_y, 2)));
+
+	// cout << "Gaze : " << gaze[0] << ", " << gaze[1] << ", " << gaze[2] << endl;
+	// vec3 lookat_pt = dummy_location + gaze;
+
+	last_dummy_loc = dummy_location;
 	model->pushMatrix(); {
 
 		float time = glfwGetTime();
 		// float time = 1.0f;
 
-		// model->translate(vec3(2, 0, -5 * (time / 10.0f)));
-		model->translate(vec3(2, 0, -5));
+		// model->translate(vec3(2, 0, -5 * (-time / 30.0f)));
+		model->translate(dummy_location);
 
-		model->rotate(-PI / 2, vec3(0, 1, 0));
+		cout << "rotate " << rotate_angle << endl;
+
+		cout << "Dummy loc: " << dummy_location[0] << ", " << dummy_location[1] << ", " << dummy_location[2] << endl;
+		// cout << "Dummy lookat: " << lookat_pt[0] << ", " << lookat_pt[1] << ", " << lookat_pt[2] << endl;
+
+		// model->lookAt(dummy_location, lookat_pt, vec3(0, 1, 0));
+
+		// model->multMatrix(dummy_rot_mat);
+		model->rotate(-rotate_angle, vec3(0, 1, 0));
+
+		// model->rotate(PI, vec3(0, 1, 0));
 		model->rotate(-PI / 2, vec3(1, 0, 0));
 		model->scale(0.01);
 
@@ -275,8 +334,6 @@ void ShapeCreeper::initPlacement(shared_ptr<MatrixStack> model) {
 			
 			// // model->translate(vec3(0, 0, 0));
 			model->translate(vec3(leg_center[0] * -0.7f, leg_center[1] * 0.9f, leg_center[2] * 0.2f));
-
-			
 
 			float frac = 0.05f * sin(time) + 0.5f;
 

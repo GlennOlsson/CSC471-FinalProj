@@ -18,6 +18,10 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <GLFW/glfw3.h>
 
+#include <chrono>
+
+#include "Spline.h"
+
 class Program;
 
 using std::shared_ptr;
@@ -65,6 +69,13 @@ class ShapeCreeper {
 	void setModel(shared_ptr<MatrixStack> model);
 
 	shared_ptr<Program> prog;
+
+	void createPath();
+	Spline path;
+
+	vec3 last_dummy_loc;
+
+	std::chrono::steady_clock::time_point last_time = std::chrono::high_resolution_clock::now();
 
 public:
 

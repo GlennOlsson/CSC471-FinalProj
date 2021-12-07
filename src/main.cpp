@@ -396,6 +396,8 @@ class Application : public EventCallbacks {
 		vec3 camera_location = path.getPosition();
 
 		vec3 location = camera_location + w_diff + u_diff;
+
+		// cout << "LOC;: " << location[0] << ", " << location[1] << ",  " << location[2] << endl;
 		location[1] = this->height;
 
 		vec3 lookat_pt = lookat + w_diff + u_diff;
