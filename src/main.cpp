@@ -68,7 +68,6 @@ class Application : public EventCallbacks {
 	// vec3 cube_min;
 	// vec3 cube_max;
 
-	float gCamH = 0;
 	// animation data
 	float lightTrans = 2;
 	float gTrans = -3;
@@ -79,13 +78,12 @@ class Application : public EventCallbacks {
 	vec3 w_diff = vec3(0);
 	vec3 u_diff = vec3(0);
 
+	float height = 0;
+
 	// Lookat will be calculated before first render dependent on phi and theta
 	vec3 lookat;
-	vec3 camera_position = vec3(0, gCamH, 0);
+	vec3 camera_position = vec3(0, height, 0);
 	vec3 camera_up_vector = vec3(0, 1, 0);
-
-	// Used to toggle the material with M
-	int current_material = 0;
 
 	string resourceDir;
 
@@ -112,8 +110,8 @@ class Application : public EventCallbacks {
 
 		// Don't alow character to move around in y-space freely, only in xz
 		// plane
-		u_vec.y = 0;
-		w_vec.y = 0;
+		// u_vec.y = 0;
+		// w_vec.y = 0;
 
 		u_diff += movement.x * u_vec;
 		w_diff += movement.y * w_vec;
@@ -163,12 +161,6 @@ class Application : public EventCallbacks {
 			is_entering = true;
 		}
 
-		// Change material
-		if (key == GLFW_KEY_M && action == GLFW_PRESS) {
-			current_material++;
-			current_material %= 4;
-		}
-
 		if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
@@ -182,7 +174,6 @@ class Application : public EventCallbacks {
 
 		if (action == GLFW_PRESS) {
 			vec3 lkat = lookat + w_diff + u_diff;
-			cout << "lookat: " << lkat[0] << ", " << lkat[1] << ", " << lkat[2] << endl;
 			blocks->removeAt(lookat + w_diff + u_diff);
 			// glfwGetCursorPos(window, &posX, &posY);
 		}
@@ -315,8 +306,8 @@ class Application : public EventCallbacks {
 		creeper_texture->setWrapModes(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 
 		// Start and end at same point
-		path = Spline(camera_position, glm::vec3(20, gCamH, 20),
-					  glm::vec3(-20, gCamH, 20), camera_position, 10);
+		path = Spline(camera_position, glm::vec3(20, height, 20),
+					  glm::vec3(-20, height, 20), camera_position, 10);
 	}
 
 	void initGeom() {
@@ -351,7 +342,6 @@ class Application : public EventCallbacks {
 
 		vector<tinyobj::shape_t> TOshapes2;
 		vector<tinyobj::material_t> objMaterials2;
-		errStr;
 		// load in the mesh and make the shape(s)
 		rc = tinyobj::LoadObj(TOshapes2, objMaterials2, errStr,
 								   (resourceDir + "/creeper.obj").c_str());
@@ -384,6 +374,7 @@ class Application : public EventCallbacks {
 
 	void render(float frametime) {
 		calculateDiff();
+
 		// Get current frame buffer size.
 		int width, height;
 		glfwGetFramebufferSize(windowManager->getHandle(), &width, &height);
@@ -406,9 +397,19 @@ class Application : public EventCallbacks {
 
 		vec3 camera_location = path.getPosition();
 
+		vec3 location = camera_location + w_diff + u_diff;
+		location[1] = this->height;
+
+		vec3 lookat_pt = lookat + w_diff + u_diff;
+		lookat_pt[1] += this->height;
+
 		auto view =
-			value_ptr(lookAt(camera_location + w_diff + u_diff,
-							 lookat + w_diff + u_diff, camera_up_vector));
+			value_ptr(lookAt(location, lookat_pt , camera_up_vector));
+		
+		vec3 block_under(location[0], location[1] - 1, location[2]);
+		if(!blocks->hasBlockAt(vec3(block_under))) {
+			this->height -= 9.81f * (1.0f/120.0f);
+		}
 
 		// Apply perspective projection.
 		Projection->pushMatrix();

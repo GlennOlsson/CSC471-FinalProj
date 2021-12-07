@@ -74,6 +74,8 @@ public:
 	bool removeAt(vec3 lookat);
 
 	void drawBlocks(shared_ptr<MatrixStack> Model);
+
+	bool hasBlockAt(vec3 v);
 };
 
 #endif

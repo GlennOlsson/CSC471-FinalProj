@@ -32,11 +32,6 @@ float Block::intersects(vec3 point) {
 	vec3 dist_vec = vec3(this->x, this->y, this->z) - point;
 	float dist = length(dist_vec);
 
-	if(dist < 2 && x == -2) {
-		cout << "coords of close block: " << x << "; " << y << "; " << z << endl;
-		cout << "dist " << dist << endl;
-	} 
-
 	return dist;
 }
 

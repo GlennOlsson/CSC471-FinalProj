@@ -12,8 +12,6 @@ out vec3 lightDir;
 out vec3 EPos;
 out vec2 vTexCoord;
 
-uniform int flip;
-
 void main() {
 
   /* First model transforms */

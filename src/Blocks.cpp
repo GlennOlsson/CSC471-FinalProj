@@ -45,7 +45,6 @@ Blocks::Blocks() {
 	texProg->addUniform("P");
 	texProg->addUniform("V");
 	texProg->addUniform("M");
-	texProg->addUniform("flip");
 	texProg->addUniform("Texture0");
 	texProg->addAttribute("vertPos");
 	texProg->addAttribute("vertNor");
@@ -252,16 +251,14 @@ bool Blocks::removeAt(vec3 lookat) {
 	shared_ptr<Block> blockat = blockAt(lookat);
 
 	if(blockat == nullptr) {
-		cout << "No block!" << endl;
 		return false;
 	}
-
-	cout << "Yes,  block!" << endl;
 
 	blocks.remove(blockat);
 
 	int x, y, z;
 	spatial_coords(lookat, x, y, z);
+
 	spatial_lookup[x][y][z] = nullptr;
 	return true;
 }
@@ -275,4 +272,8 @@ void Blocks::drawBlocks(shared_ptr<MatrixStack> Model) {
 	}
 
 	this->texProg->unbind();
+}
+
+bool Blocks::hasBlockAt(vec3 v) {
+	return this->blockAt(v) != nullptr;
 }
