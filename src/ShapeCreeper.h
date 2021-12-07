@@ -37,20 +37,30 @@ class ShapeCreeper {
 
 	void drawRightArm();
 	void drawLeftArm();
-	void drawRightLeg();
-	void drawLeftLeg();
+
+	void drawRightUpperLeg();
+	void drawLeftUpperLeg();
+	
+	void drawRightLowerLeg();
+	void drawLeftLowerLeg();
 
 	vec3 bounding_right_arm_max;
 	vec3 bounding_right_arm_min;
-	
+
 	vec3 bounding_left_arm_max;
 	vec3 bounding_left_arm_min;
 
 	vec3 bounding_right_leg_max;
 	vec3 bounding_right_leg_min;
 
+	vec3 bounding_right_lower_leg_max;
+	vec3 bounding_right_lower_leg_min;
+
 	vec3 bounding_left_leg_max;
 	vec3 bounding_left_leg_min;
+
+	vec3 bounding_left_lower_leg_max;
+	vec3 bounding_left_lower_leg_min;
 
 	void setModel(shared_ptr<MatrixStack> model);
 

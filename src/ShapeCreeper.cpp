@@ -85,8 +85,12 @@ ShapeCreeper::ShapeCreeper(vector<tinyobj::shape_t> s, shared_ptr<Program> prog)
 
 		if(index <= 5) { // Right leg
 			max_min(body_min, body_max, bounding_right_leg_min, bounding_right_leg_max);
+			if(index <= 2)
+				max_min(body_min, body_max, bounding_right_lower_leg_min, bounding_right_lower_leg_max);
 		} else if(index <= 11) { // Left leg
 			max_min(body_min, body_max, bounding_left_leg_min, bounding_left_leg_max);
+			if(index <= 8)
+				max_min(body_min, body_max, bounding_left_lower_leg_min, bounding_left_lower_leg_max);
 		} else if(index >= 15 && index <= 20) { // Right arm
 			max_min(body_min, body_max, bounding_right_arm_min, bounding_right_arm_max);
 		} else if(index >= 21 && index <= 26) { // Left arm
@@ -113,11 +117,17 @@ void ShapeCreeper::drawRightArm() {
 void ShapeCreeper::drawLeftArm() {
 	drawBetween(21, 27);
 }
-void ShapeCreeper::drawRightLeg() {
-	drawBetween(0, 6);
+void ShapeCreeper::drawRightUpperLeg() {
+	drawBetween(3, 6);
 }
-void ShapeCreeper::drawLeftLeg() {
-	drawBetween(6, 12);
+void ShapeCreeper::drawLeftUpperLeg() {
+	drawBetween(9, 12);
+}
+void ShapeCreeper::drawRightLowerLeg() {
+	drawBetween(0, 4);
+}
+void ShapeCreeper::drawLeftLowerLeg() {
+	drawBetween(6, 10);
 }
 
 void ShapeCreeper::setModel(shared_ptr<MatrixStack> model) {
@@ -136,6 +146,10 @@ vec3 center_of_bounds(vec3 min, vec3 max) {
 void ShapeCreeper::initPlacement(shared_ptr<MatrixStack> model) {
 	model->pushMatrix(); {
 
+		float time = glfwGetTime();
+		// float time = 1.0f;
+
+		// model->translate(vec3(2, 0, -5 * (time / 10.0f)));
 		model->translate(vec3(2, 0, -5));
 
 		model->rotate(-PI / 2, vec3(0, 1, 0));
@@ -145,76 +159,57 @@ void ShapeCreeper::initPlacement(shared_ptr<MatrixStack> model) {
 		vec3 center = center_of_bounds(bounding_min, bounding_max);
 
 		// Move right arm like pendulum
-		// model->pushMatrix(); {
-
-		// 	vec3 left_shoulder_max = shapes[14]->max;
-		// 	vec3 left_shoulder_min = shapes[14]->min;
-		// 	vec3 left_shoulder_center = center_of_bounds(left_shoulder_min, left_shoulder_max);
+		model->pushMatrix(); {
+			vec3 arm_center = center_of_bounds(bounding_left_arm_min, bounding_left_arm_max);
 			
-		// 	vec3 left_shoulder_joint = vec3(left_shoulder_center[1] / 2.0f, left_shoulder_max[0], left_shoulder_max[2] * 0.95f);
+			model->translate(vec3(0, arm_center[1] * 0.3f, arm_center[2] * 0.35f));
 
-		// 	vec3 arm_center = center_of_bounds(bounding_left_arm_min, bounding_left_arm_max);
 			
-		// 	model->translate(vec3(0, arm_center[1] * 0.3f, arm_center[2] * 0.35f));
 
-		// 	float time = glfwGetTime();
+			float frac = 0.10f * sin(time) + 0.5f;
 
-		// 	float frac = 0.15f * sin(time) + 0.5f;
+			model->rotate(2 * PI * frac, vec3(0, 1, 0));
 
-		// 	model->rotate(2 * PI * frac, vec3(0, 1, 0));
+			model->rotate(PI * 0.5f, vec3(1, 0, 0));
 
-		// 	model->rotate(PI * 0.5f, vec3(1, 0, 0));
+			// Move to joint (by origin)
+			model->translate(vec3(0, arm_center[1] * 0.6f, 0));
 
-		// 	// Move to joint (by origin)
-		// 	model->translate(vec3(0, arm_center[1] * 0.6f, 0));
+			//Move to center
+			model->translate(-arm_center);
 
-		// 	//Move to center
-		// 	model->translate(-arm_center);
+			setModel(model);
+			drawLeftArm();
 
-		// 	setModel(model);
-		// 	drawLeftArm();
+		}
+		model->popMatrix();
 
-		// }
-		// model->popMatrix();
-
-		// // Move left arm like pendulum, opposite sync compared to other arm
-		// model->pushMatrix(); {
-
-		// 	vec3 right_shoulder_max = shapes[14]->max;
-		// 	vec3 right_shoulder_min = shapes[14]->min;
-		// 	vec3 right_shoulder_center = center_of_bounds(right_shoulder_min, right_shoulder_max);
+		// Move left arm like pendulum, opposite sync compared to other arm
+		model->pushMatrix(); {
+			vec3 arm_center = center_of_bounds(bounding_right_arm_min, bounding_right_arm_max);
 			
-		// 	vec3 right_shoulder_joint = vec3(right_shoulder_center[1] / 2.0f, right_shoulder_max[0], right_shoulder_max[2] * 0.95f);
+			model->translate(vec3(0, arm_center[1] * 0.3f, arm_center[2] * 0.35f));
 
-		// 	vec3 arm_center = center_of_bounds(bounding_right_arm_min, bounding_right_arm_max);
-			
-		// 	model->translate(vec3(0, arm_center[1] * 0.3f, arm_center[2] * 0.35f));
+			float frac = -0.10f * sin(time) + 0.5f;
 
-		// 	float time = glfwGetTime();
+			model->rotate(2 * PI * frac, vec3(0, 1, 0));
 
-		// 	float frac = -0.15f * sin(time) + 0.5f;
+			model->rotate(PI * -0.5f, vec3(1, 0, 0));
 
-		// 	model->rotate(2 * PI * frac, vec3(0, 1, 0));
+			// Move to joint (by origin)
+			model->translate(vec3(0, arm_center[1] * 0.6f, 0));
 
-		// 	model->rotate(PI * -0.5f, vec3(1, 0, 0));
+			//Move to center
+			model->translate(-arm_center);
 
-		// 	// Move to joint (by origin)
-		// 	model->translate(vec3(0, arm_center[1] * 0.6f, 0));
+			setModel(model);
+			drawRightArm();
 
-		// 	//Move to center
-		// 	model->translate(-arm_center);
-
-		// 	setModel(model);
-		// 	drawRightArm();
-
-		// }
-		// model->popMatrix();
+		}
+		model->popMatrix();
 
 		// Right leg
 		model->pushMatrix(); {
-			vec3 ass_max = shapes[12]->max;
-			vec3 ass_min = shapes[12]->min;
-			vec3 ass_center = center_of_bounds(ass_min, ass_max);
 			
 			// vec3 right_ass_joint = vec3(ass_center[0] / 2.0f, ass_max[0], ass_max[2] * 0.95f);
 
@@ -223,9 +218,7 @@ void ShapeCreeper::initPlacement(shared_ptr<MatrixStack> model) {
 			// model->translate(vec3(0, 0, 0));
 			model->translate(vec3(leg_center[0] * -0.7f, leg_center[1] * 0.9f, leg_center[2] * 0.2f));
 
-			float time = glfwGetTime();
-
-			float frac = -0.15f * sin(time) + 0.5f;
+			float frac = -0.05f * sin(time) + 0.5f;
 
 			model->rotate((2.0f * PI * frac) + PI , vec3(0, 1, 0));
 
@@ -239,13 +232,101 @@ void ShapeCreeper::initPlacement(shared_ptr<MatrixStack> model) {
 			//Move to center
 			model->translate(-leg_center);
 
+			// Bend lower leg
+			model->pushMatrix(); {
+				vec3 lower_leg_center = center_of_bounds(bounding_right_leg_min, bounding_right_leg_max);
+			
+				// model->translate(vec3(0, 0, 0));
+				model->translate(vec3(lower_leg_center[0] * 0.3f, lower_leg_center[1] * 1.0f, lower_leg_center[2] * 1.1f));
+
+
+				// Between pi/2 and 3pi/2
+				float frac = -0.1f * sin(time) + 0.5f;
+
+				float rads = max((2.0f * PI * frac) + PI, 6.3);
+
+				model->rotate(rads , vec3(0, 1, 0));
+
+				// // model->rotate((2.0f * PI * 0.1) + PI , vec3(0, 1, 0));
+
+				// // model->rotate(PI * -0.5f, vec3(1, 0, 0));
+
+				// Move to joint (by origin)
+				model->translate(vec3(lower_leg_center[0] * 0.8f, lower_leg_center[1] * -0.0f, lower_leg_center[2] * -0.15f));
+
+				//Move to center
+				model->translate(-lower_leg_center);
+				
+				setModel(model);
+				drawRightLowerLeg();
+			}
+			model->popMatrix();
+
 			setModel(model);
-			drawRightLeg();
+			drawRightUpperLeg();
 
 		}
 		model->popMatrix();
 
+		// Left leg
+		model->pushMatrix(); {
 		
+			vec3 leg_center = center_of_bounds(bounding_left_leg_min, bounding_left_leg_max);
+			
+			// // model->translate(vec3(0, 0, 0));
+			model->translate(vec3(leg_center[0] * -0.7f, leg_center[1] * 0.9f, leg_center[2] * 0.2f));
+
+			
+
+			float frac = 0.05f * sin(time) + 0.5f;
+
+			model->rotate((2.0f * PI * frac) + PI , vec3(0, 1, 0));
+
+			// model->rotate((2.0f * PI * 0.1) + PI , vec3(0, 1, 0));
+
+			// model->rotate(PI * -0.5f, vec3(1, 0, 0));
+
+			// Move to joint (by origin)
+			model->translate(vec3(leg_center[0] * 0.8f, leg_center[1] * -0.0f, leg_center[2] * -1.0f));
+
+			//Move to center
+			model->translate(-leg_center);
+
+			// Bend lower leg
+			model->pushMatrix(); {
+				vec3 lower_leg_center = center_of_bounds(bounding_left_leg_min, bounding_left_leg_max);
+			
+				// model->translate(vec3(0, 0, 0));
+				model->translate(vec3(lower_leg_center[0] * 0.3f, lower_leg_center[1] * 1.0f, lower_leg_center[2] * 1.1f));
+
+
+				// Between pi/2 and 3pi/2
+				float frac = 0.1f * sin(time) + 0.5f;
+
+				float rads = max((2.0f * PI * frac) + PI, 6.3);
+
+				model->rotate(rads , vec3(0, 1, 0));
+
+				// // model->rotate((2.0f * PI * 0.1) + PI , vec3(0, 1, 0));
+
+				// // model->rotate(PI * -0.5f, vec3(1, 0, 0));
+
+				// Move to joint (by origin)
+				model->translate(vec3(lower_leg_center[0] * 0.8f, lower_leg_center[1] * -0.0f, lower_leg_center[2] * -0.15f));
+
+				//Move to center
+				model->translate(-lower_leg_center);
+				
+				setModel(model);
+				drawLeftLowerLeg();
+			}
+			model->popMatrix();
+
+			setModel(model);
+			drawLeftUpperLeg();
+
+		}
+		model->popMatrix();
 
 		model->pushMatrix(); {
 

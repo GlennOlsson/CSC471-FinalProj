@@ -417,8 +417,8 @@ class Application : public EventCallbacks {
 		Projection->perspective(45.0f, aspect, 0.01f, 100.0f);
 
 		// Multiple use
-		// vec3 light_position = vec3(2.0, 2.0, lightTrans);
-		vec3 light_position = vec3(0);
+		vec3 light_position = vec3(2.0, 2.0, lightTrans);
+		// vec3 light_position = vec3(0);
 
 		// Draw the scene
 		prog->bind();
