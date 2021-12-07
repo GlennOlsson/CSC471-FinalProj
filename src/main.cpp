@@ -110,8 +110,8 @@ class Application : public EventCallbacks {
 
 		// Don't alow character to move around in y-space freely, only in xz
 		// plane
-		// u_vec.y = 0;
-		// w_vec.y = 0;
+		u_vec.y = 0;
+		w_vec.y = 0;
 
 		u_diff += movement.x * u_vec;
 		w_diff += movement.y * w_vec;
@@ -409,6 +409,9 @@ class Application : public EventCallbacks {
 		vec3 block_under(location[0], location[1] - 1, location[2]);
 		if(!blocks->hasBlockAt(vec3(block_under))) {
 			this->height -= 9.81f * (1.0f/120.0f);
+			if(this->height < -10) {
+				this->height = 2;
+			}
 		}
 
 		// Apply perspective projection.

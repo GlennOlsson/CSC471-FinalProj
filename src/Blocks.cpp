@@ -10,6 +10,8 @@
 #include "Shape.h"
 #include "MatrixStack.h"
 
+#include <math.h>
+
 using namespace std;
 using namespace glm;
 

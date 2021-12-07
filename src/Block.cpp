@@ -38,7 +38,7 @@ float Block::intersects(vec3 point) {
 void Block::draw(shared_ptr<MatrixStack> Model, shared_ptr<Program> textureProgram) {
 	Model->pushMatrix();
 
-	Model->translate(vec3(x - 0.5, y - 0.5, z - 0.5));
+	Model->translate(vec3(x, y-0.5, z));
 
 	glUniformMatrix4fv(textureProgram->getUniform("M"), 1, GL_FALSE,
 						   value_ptr(Model->topMatrix()));
